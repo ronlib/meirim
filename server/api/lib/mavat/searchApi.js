@@ -3,6 +3,10 @@ const fs = require('fs');
 const Bluebird = require('bluebird');
 const Log = require('../../lib/log');
 
+process.on('unhandledRejection', (reason) => {
+	Log.warn('[searchApi] Suppressed unhandled rejection', { error: reason?.message });
+});
+
 const SV3_SEARCH_URL = 'https://mavat.iplan.gov.il/rest/api/sv3/Search';
 const SV3_PAGE_URL = 'https://mavat.iplan.gov.il/SV3';
 const PAGE_SIZE = 20;
