@@ -11,8 +11,8 @@ const HEBREW_TRANSLATION = {
 	signout: 'התנתקות',
 	joinMeirimCommunity: 'בואו להיות חלק מקהילת מעירים!',
 	name: 'מעירים',
-	myPlans: 'התוכניות שלי',
-	plans: 'תוכניות',
+	myPlans: 'השמורים שלי',
+	plans: 'בנייה',
 	permits: 'היתרים',
 	treePermits: 'עצים',
 	vocabulary: 'מילון',
@@ -22,7 +22,7 @@ const HEBREW_TRANSLATION = {
 	urbanPlanningSubtitle:
 		'אנחנו מנגישים ידע ויוצרים תוכן כדי שתוכלו גם לדעת, גם להבין וגם להשפיע על המערכת שהכי משפיעה על החיים שלנו, מערכת התכנון והבניה.',
 	meirimTitle: 'מידע תכנוני ואקטיביזם עירוני',
-	newAlert: '🏠 תוכניות בניה',
+	newAlert: '🏠 בנייה',
 	newAlertTree: '🌳 רשיונות כריתה של עצים',
 	emailAddress: 'כתובת דוא"ל ',
 	fullName: 'שם מלא',
@@ -46,9 +46,9 @@ const HEBREW_TRANSLATION = {
 		</div>
 	),
 	howItWorks: `
-         מערכת ההתראות שלנו מאגדת במקום אחד את כל התוכניות מכל
+         מערכת ההתראות שלנו מאגדת במקום אחד את כל התכניות וההיתרים מכל
          ועדות התכנון ותשלח לכם התראה למייל לפי העדפה
-        גיאוגרפית ובזמן אמת בכל פעם שסטטוס התכנית ישתנה.
+        גיאוגרפית ובזמן אמת בכל פעם שיש עדכון.
         מהיום תוכלו לעקוב בקלות אחרי השינויים ליד הבית שלכם.`,
 	summary: 'תקציר',
 	opinion: 'חוות דעת',
@@ -96,14 +96,14 @@ const HEBREW_TRANSLATION = {
 	publishComment: 'פרסום חוות דעת',
 	improvement: 'הצעה לשיפור',
 	general: 'חוות דעת כללית',
-	savedPlans: 'תוכניות שמורות',
-	noPlansSavedTitle: 'טרם שמרת תוכניות',
+	savedPlans: 'פריטים שמורים',
+	noPlansSavedTitle: 'טרם שמרת פריטים',
 	ourFacebook: 'Facebook',
 	ourTwitter: 'Twitter',
 	ourInstagram: 'Instagram',
 	ourGithub: 'Github',
 	noPlansSavedContent:
-		'ניתן לשמור תוכניות כדי לקבל עידכונים שוטפים על כל תוכנית בארץ',
+		'ניתן לשמור תכניות והיתרים כדי לקבל עידכונים שוטפים',
 	areaUnitChanges: 'שינוי שטח',
 	housingUnitChanges: 'שינוי יחידות דיור',
 	planData: 'נתוני התוכנית',
@@ -129,8 +129,8 @@ const HEBREW_TRANSLATION = {
 		'"מעירים" הנה עמותה ללא מטרות רווח. אנחנו קבוצה של אנשי מקצוע ופעילים חברתיים משדות התכנון, הבנייה, הסביבה והטכנולוגיה הפועלים לילות כימים ובהתנדבות על מנת להנגיש מידע ולהגביר את השקיפות והמעורבות הציבורית במערכת התכנון והבנייה. כאחת המערכות המשפיעות ביותר על החיים האזרחיים בישראל, אנחנו פועלים להפוך אותה לכזו שמשקפת את האיזון הראוי בין אינטרסים צרים לאינטרסים רחבים, האינטרסים של כולנו.',
 	fundingSuccessTitle: 'תודה על התמיכה!',
 	fundingSuccessText:
-		'יאללה, כנסו לעמוד התוכניות שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
-	fundingSuccessPlans: 'לעמוד התוכניות',
+		'יאללה, כנסו לעמוד הבנייה שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
+	fundingSuccessPlans: 'לעמוד הבנייה',
 	fundingSuccessHome: 'לדף הבית',
 	fundingSuccessClose: 'סגירה',
 	readMoreAboutAchievements: 'קראו עוד על ההצלחות שלנו',
@@ -154,8 +154,8 @@ const HEBREW_TRANSLATION = {
 	homepageMainTopTitle: 'מעירים את העיר!',
 	homepageMainSubTitleA:
 		'אנחנו במעירים (ע"ר) פועלים להגברת השקיפות והמעורבות המקצועית והציבורית בהליכי קבלת ההחלטות הנוגעים לתכנון המרחב בו אנחנו חיים. הרשמו למערכת שלנו כדי לקבל התראות בזמן אמת, לפי כתובת מגורים או העדפה גיאוגרפית, על ',
-	homepageMainSubTitlePlansLinkText: 'תוכניות בנייה',
-	homepageMainSubTitleB: ' חדשות וקיימות ורישיונות ',
+	homepageMainSubTitlePlansLinkText: 'תכניות והיתרי בנייה',
+	homepageMainSubTitleB: ' ורישיונות ',
 	homepageMainSubTitleTreesLinkText: 'לכריתת עצים',
 	homepageBanner:
 		'מעירים (ע״ר) משנה את חוקי המשחק, ונותנת את הכוח להשפיע על עתיד הערים שלנו',
@@ -169,7 +169,7 @@ const HEBREW_TRANSLATION = {
 	treesHelperTextLink: 'להגיש ערר',
 	treesHelperTextB: '.\nהכניסו שם יישוב וצפו ברישיונות הכריתה:',
 	plansHelperText:
-		'שינויים במרחב שלנו מחייבים עריכת תוכנית. ועדות התכנון והבנייה אמונות על פיקוח ואישור התוכניות.',
+		'שינויים במרחב שלנו מחייבים תכניות והיתרי בנייה. ועדות התכנון והבנייה אמונות על פיקוח ואישור.',
 	allRightsReserved: 'כל הזכויות שמורות',
 	privacyPolicy: 'מדיניות פרטיות',
 	accessibilityDeclaration: 'הצהרת נגישות',
@@ -188,7 +188,7 @@ const HEBREW_TRANSLATION = {
 	searchAddressBlockNotFound: 'לא נמצאו תוצאות, נסו שוב',
 	block: 'גוש',
 	parcel: 'חלקה',
-	watchPlans: 'צפיה בתוכניות',
+	watchPlans: 'צפייה בבנייה',
 	alertsSubtitle: 'כדי לקבל התראות רלבנטיות הזינו כתובת ורדיוס',
 	alertsSubtitleInfo:
 		'*כתובת מגורים, שיש בה דירה בבעלותכם, או כל כתובת שיש לכם עניין לגבי הסביבה שלה',
@@ -220,12 +220,12 @@ const HEBREW_TRANSLATION = {
 	noAddress: 'הכתובת לא נמצאה',
 	addressExample: 'לדוגמא: מאז"ה 9, תל אביב',
 	searchAddressOrCity: 'חפש כתובת או עיר',
-	showPlans: 'הצג תוכניות:',
+	showPlans: 'הצג:',
 	inProgress: 'בתהליך',
 	approved: 'מאושרות',
 	moreInfo: 'מידע נוסף',
-	showPlansTooltip: `תוכניות מאושרות הן תוכניות שעברו.
-תוכניות בתהליך הן תוכניות שעוברות תהליך אישור בועדות.`,
+	showPlansTooltip: `תכניות מאושרות הן תכניות שעברו אישור.
+תכניות בתהליך הן תכניות שעוברות תהליך אישור בועדות.`,
 	tags: {
 		public: 'מבני ציבור',
 		housing: 'דיור',
@@ -240,7 +240,7 @@ const HEBREW_TRANSLATION = {
 		createAlerts: 'נרשמים בחינם לקבלת התראות',
 		discoverPlanning: 'מחפשים את הכתובת שלכם',
 		treePermits: 'ואפשר גם לעזור להציל עצים מכריתה!',
-		savePlans: 'שומרים את התוכניות הרלוונטיות עבורכם',
+		savePlans: 'שומרים את הפריטים הרלוונטיים עבורכם',
 	},
 	planLinks: 'קישורים',
 	whatsappLinkAction: 'הצטרפות לקבוצה',
@@ -268,8 +268,8 @@ const HEBREW_TRANSLATION = {
 	noAOISavedTitle: 'טרם נוספו איזורי עניין',
 	addAOILinkTitle: 'מעבר להוספת איזורי עניין',
 
-	plansHelperTitle: 'חיפוש תוכניות בנייה',
-	plansSearchingTextA: 'אנחנו מחפשים בשבילך את התוכניות...',
+	plansHelperTitle: 'חיפוש בנייה',
+	plansSearchingTextA: 'אנחנו מחפשים בשבילך...',
 	plansSearchingTextB: 'זה לא יקח הרבה זמן!',
 	GISFileUpload: 'העלאת קובץ GIS',
 	GISFile: 'קובץ GIS',
@@ -315,20 +315,20 @@ const ARABIC_TRANSLATION = {
 	signout: 'خروج',
 	signupNow: 'سجلو الان',
 	name: 'معيريم',
-	myPlans: 'مخططاتي',
+	myPlans: 'المحفوظات',
 	loginToCompleteAction: 'لإكمال العملية يجب أن تسجلي الدخول',
 	// searchAddress: 'ادخل عنوان',
 	// searchAddressPlaceholder: 'ادخل عنوان',
 	// searchBlockParcel:'البحث عن حوض وقسيمة',
 	block: 'حوض',
 	parcel: 'قسيمة',
-	plans: 'مخططات',
+	plans: 'بناء',
 	searchBoxTitle: 'هل لديك فضول لمعرفة ما الذي يتم بناؤه بالقرب من منزلك؟',
 	treePermits: 'اشجار',
 	vocabulary: 'قاموس',
 	whoWeAre: 'من نحن',
 	meirimTitle: 'معلومات تخطيطية ونشاط بلدي',
-	newAlert: '🏠 مخططات بناء',
+	newAlert: '🏠 بناء',
 	alertsSubtitle: 'للحصول على إشعار، أدخل العنوان وقطر المحيط',
 	alertsSubtitleInfo:
 		'يمكنك ادخال عنوان سكني، او عنوان شقتك، أو أي عنوان تهتم به فيما يتعلق بمحيطه',
@@ -364,9 +364,9 @@ const ARABIC_TRANSLATION = {
 		</div>
 	),
 	howItWorks: `
-         מערכת ההתראות שלנו מאגדת במקום אחד את כל התוכניות מכל
+         מערכת ההתראות שלנו מאגדת במקום אחד את כל התכניות וההיתרים מכל
          ועדות התכנון ותשלח לכם התראה למייל לפי העדפה
-        גיאוגרפית ובזמן אמת בכל פעם שסטטוס התכנית ישתנה.
+        גיאוגרפית ובזמן אמת בכל פעם שיש עדכון.
         מהיום תוכלו לעקוב בקלות אחרי השינויים ליד הבית שלכם.`,
 	summary: 'ملخص',
 	opinion: 'تعليقات',
@@ -416,10 +416,10 @@ const ARABIC_TRANSLATION = {
 	publishComment: 'פרסום חוות דעת',
 	improvement: 'הצעה לשיפור',
 	general: 'חוות דעת כללית',
-	savedPlans: 'תוכניות שמורות',
-	noPlansSavedTitle: 'טרם שמרת תוכניות',
+	savedPlans: 'פריטים שמורים',
+	noPlansSavedTitle: 'טרם שמרת פריטים',
 	noPlansSavedContent:
-		'ניתן לשמור תוכניות כדי לקבל עידכונים שוטפים על כל תוכנית בארץ',
+		'ניתן לשמור תכניות והיתרים כדי לקבל עידכונים שוטפים',
 	areaUnitChanges: 'تغيير مساحة',
 	housingUnitChanges: 'تغييرات وحدات سكنية',
 	planData: 'معلومات المخطط',
@@ -444,9 +444,9 @@ const ARABIC_TRANSLATION = {
 		'"מעירים" הנה עמותה ללא מטרות רווח. אנחנו קבוצה של אנשי מקצוע ופעילים חברתיים משדות התכנון, הבנייה, הסביבה והטכנולוגיה הפועלים לילות כימים ובהתנדבות על מנת להנגיש מידע ולהגביר את השקיפות והמעורבות הציבורית במערכת התכנון והבנייה. כאחת המערכות המשפיעות ביותר על החיים האזרחיים בישראל, אנחנו פועלים להפוך אותה לכזו שמשקפת את האיזון הראוי בין אינטרסים צרים לאינטרסים רחבים, האינטרסים של כולנו.',
 	fundingSuccessTitle: 'תודה על התמיכה!',
 	fundingSuccessText:
-		'יאללה, כנסו לעמוד התוכניות שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
+		'יאללה, כנסו לעמוד הבנייה שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
 	whoAmI: 'من انا؟',
-	fundingSuccessPlans: 'לעמוד התוכניות',
+	fundingSuccessPlans: 'לעמוד הבנייה',
 	fundingSuccessHome: 'لصفحة الرئيسية',
 	fundingSuccessClose: 'اغلاق',
 	lastDateToObjectTrees: 'תאריך אחרון להגשת ערר',
@@ -469,8 +469,8 @@ const ARABIC_TRANSLATION = {
 	homepageMainTopTitle: 'מעירים את העיר!',
 	homepageMainSubTitleA:
 		'نحن فب معيريم نعمل لزيادة الشفافية والحراك المهني والجماهيري في سيرورة اتخاذ القرار بكل ما يتعلق بمجال تخطيط الحيز الذي نعيش به. انضموا الى المنظومة لتتمكنوا من الحصول على اطراءات عن مخططات بناء جديدة او قديمة بقربة عنوانكم او بأي منطقة جغرافية اخرى.',
-	homepageMainSubTitlePlansLinkText: 'خطط بناء',
-	homepageMainSubTitleB: 'جديدة وقديمة ورخص',
+	homepageMainSubTitlePlansLinkText: 'خطط وتصاريح بناء',
+	homepageMainSubTitleB: 'ورخص',
 	homepageMainSubTitleTreesLinkText: 'لقطع الاشجار',
 	homepageBanner:
 		'מעירים (ע״ר) משנה את חוקי המשחק, ונותנת את הכוח להשפיע על עתיד הערים שלנו',
@@ -482,15 +482,15 @@ const ARABIC_TRANSLATION = {
 	plansHelperText:
 		'التغييرات في منطقتنا تتطلب تعديل المخطط. لجان التخطيط والبناء هي المسؤولة عن الإشراف والموافقة على المخططات.',
 	searchAddressOrCity: 'חפש כתובת או עיר',
-	showPlans: 'הצג תוכניות:',
+	showPlans: 'הצג:',
 	inProgress: 'בתהליך',
 	approved: 'מאושרות',
 	urbanPlanning: 'معرفة',
 	urbanPlanningTitle: 'بنك المعرفة	',
 	urbanPlanningSubtitle:
 		'نحن نجعل المعرفة متاحة وننشئ المحتوى حتى تتمكنوا من المعرفة، الفهم وكذلك التأثير على النظام الأكثر تأثيرًا على حياتنا، نظام "التخطيط والبناء"',
-	showPlansTooltip: `תוכניות מאושרות הן תוכניות שעברו.
-תוכניות בתהליך הן תוכניות שעוברות תהליך אישור בועדות.`,
+	showPlansTooltip: `תכניות מאושרות הן תכניות שעברו אישור.
+תכניות בתהליך הן תכניות שעוברות תהליך אישור בועדות.`,
 	tags: {
 		public: 'مباني عامة',
 		housing: 'سكن',
@@ -505,7 +505,7 @@ const ARABIC_TRANSLATION = {
 		createAlerts: 'נרשמים בחינם לקבלת התראות',
 		discoverPlanning: 'מחפשים את הכתובת שלכם',
 		treePermits: 'ואפשר גם לעזור להציל עצים מכריתה!',
-		savePlans: 'שומרים את התוכניות הרלוונטיות עבורכם',
+		savePlans: 'שומרים את הפריטים הרלוונטיים עבורכם',
 	},
 	planLinks: 'الروابط',
 	whatsappLinkAction: 'الانضمام للمجموعة',
@@ -552,13 +552,13 @@ export default {
 	signin: 'تسجيل الدخول',
 	signout: 'התנתקות',
 	name: 'מעירים',
-	myPlans: 'התוכניות שלי',
-	plans: 'مخططات',
+	myPlans: 'השמורים שלי',
+	plans: 'بناء',
 	treePermits: 'اشجار',
 	vocabulary: 'قاموس',
 	whoWeAre: 'من نحن',
 	meirimTitle: 'מידע תכנוני ואקטיביזם עירוני',
-	newAlert: 'תוכניות בניה',
+	newAlert: 'בנייה',
 	newAlertTree: 'רשיונות כריתה של עצים',
 	emailAddress: 'כתובת דוא"ל',
 	fullName: 'שם מלא',
@@ -581,9 +581,9 @@ export default {
 		</div>
 	),
 	howItWorks: `
-         מערכת ההתראות שלנו מאגדת במקום אחד את כל התוכניות מכל
+         מערכת ההתראות שלנו מאגדת במקום אחד את כל התכניות וההיתרים מכל
          ועדות התכנון ותשלח לכם התראה למייל לפי העדפה
-        גיאוגרפית ובזמן אמת בכל פעם שסטטוס התכנית ישתנה.
+        גיאוגרפית ובזמן אמת בכל פעם שיש עדכון.
         מהיום תוכלו לעקוב בקלות אחרי השינויים ליד הבית שלכם.`,
 	saved: 'שמור',
 	addNewComment: 'הוספת חוות דעת',
@@ -625,10 +625,10 @@ export default {
 	publishComment: 'פרסום חוות דעת',
 	improvement: 'הצעה לשיפור',
 	general: 'חוות דעת כללית',
-	savedPlans: 'תוכניות שמורות',
-	noPlansSavedTitle: 'טרם שמרת תוכניות',
+	savedPlans: 'פריטים שמורים',
+	noPlansSavedTitle: 'טרם שמרת פריטים',
 	noPlansSavedContent:
-		'ניתן לשמור תוכניות כדי לקבל עידכונים שוטפים על כל תוכנית בארץ',
+		'ניתן לשמור תכניות והיתרים כדי לקבל עידכונים שוטפים',
 	areaUnitChanges: 'שינוי שטח',
 	housingUnitChanges: 'שינוי יחידות דיור',
 	planData: 'נתוני התוכנית',
@@ -655,8 +655,8 @@ export default {
 		'"מעירים" הנה עמותה ללא מטרות רווח. אנחנו קבוצה של אנשי מקצוע ופעילים חברתיים משדות התכנון, הבנייה, הסביבה והטכנולוגיה הפועלים לילות כימים ובהתנדבות על מנת להנגיש מידע ולהגביר את השקיפות והמעורבות הציבורית במערכת התכנון והבנייה. כאחת המערכות המשפיעות ביותר על החיים האזרחיים בישראל, אנחנו פועלים להפוך אותה לכזו שמשקפת את האיזון הראוי בין אינטרסים צרים לאינטרסים רחבים, האינטרסים של כולנו.',
 	fundingSuccessTitle: 'תודה על התמיכה!',
 	fundingSuccessText:
-		'יאללה, כנסו לעמוד התוכניות שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
-	fundingSuccessPlans: 'לעמוד התוכניות',
+		'יאללה, כנסו לעמוד הבנייה שלנו, גלו מה בונים לכם ליד הבית, שתפו עם החברים והחברות באזור והשפיעו על עתיד השכונה והעיר שלכם!',
+	fundingSuccessPlans: 'לעמוד הבנייה',
 	fundingSuccessHome: 'לדף הבית',
 	fundingSuccessClose: 'סגירה',
 	lastDateToObjectTrees: 'תאריך אחרון להגשת ערר',
@@ -679,8 +679,8 @@ export default {
 	homepageMainTitle: 'מעירים: לדעת, להשתתף ולהשפיע!',
 	homepageMainSubTitleA:
 		'אנחנו במעירים (ע"ר) פועלים להגברת השקיפות והמעורבות המקצועית והציבורית בהליכי קבלת ההחלטות הנוגעים לתכנון המרחב בו אנחנו חיים. הרשמו למערכת שלנו כדי לקבל התראות בזמן אמת, לפי כתובת מגורים או העדפה גיאוגרפית, על ',
-	homepageMainSubTitlePlansLinkText: 'תוכניות בנייה',
-	homepageMainSubTitleB: ' חדשות וקיימות ורישיונות ',
+	homepageMainSubTitlePlansLinkText: 'תכניות והיתרי בנייה',
+	homepageMainSubTitleB: ' ורישיונות ',
 	homepageMainSubTitleTreesLinkText: 'לכריתת עצים',
 	treesHelperTitle: 'רשיונות כריתה של עצים - חדש באתר!',
 	treesHelperTextA:
@@ -688,10 +688,10 @@ export default {
 	treesHelperTextLink: 'להגיש ערר',
 	treesHelperTextB: '.\nהכניסו שם יישוב וצפו ברישיונות הכריתה:',
 	searchAddressOrCity: 'חפש כתובת או עיר',
-	showPlans: 'הצג תוכניות:',
+	showPlans: 'הצג:',
 	inProgress: 'בתהליך',
 	approved: 'מאושרות',
-	showPlansTooltip: `תוכניות מאושרות הן תוכניות שעברו.
-תוכניות בתהליך הן תוכניות שעוברות תהליך אישור בועדות.`,
+	showPlansTooltip: `תכניות מאושרות הן תכניות שעברו אישור.
+תכניות בתהליך הן תכניות שעוברות תהליך אישור בועדות.`,
 	planLinks: 'קישורים',
 };

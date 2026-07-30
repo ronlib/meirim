@@ -5,7 +5,6 @@ import Mapa from 'components/Mapa';
 import PropTypes from 'prop-types';
 import { Grid } from '@material-ui/core';
 import {withTheme} from '@material-ui/core/styles';
-import moment from 'moment'
 import styled from 'styled-components';
 import {
     BookmarkOutlinedIcon,
@@ -20,6 +19,12 @@ import { useDispatch } from 'react-redux';
 
 const formatNumber = (number, maximumSignificantDigits = 2) => new Intl.NumberFormat('he-IL', { maximumSignificantDigits }).format(number);
 
+const getTypeLabel = (plan) => {
+    const charName = plan?.PLAN_CHARACTOR_NAME;
+    if (charName && charName !== 'היתר בניה') return `תכנית-${charName}`;
+    return 'תכנית בניה';
+};
+
 const PlanCard = ({ plan }) => {
 	const tagsWrapperRef = useRef(null);
     const [tags, setTags] = useState(plan?.tags || []);
@@ -27,6 +32,7 @@ const PlanCard = ({ plan }) => {
 	const tagsRef = useRef([...(plan?.tags || []).map(() => createRef()), createRef()]);
     const dispatch = useDispatch();
     const { isAuthenticated } = UserSelectors();
+    const isBuildingPermit = plan?.PLAN_CHARACTOR_NAME === 'היתר בניה';
     const areaInDunam = plan?.data?.PL_AREA_DUNAM ? formatNumber(plan?.data?.PL_AREA_DUNAM) : 0;
     const housingUnitAddition = plan?.data?.QUANTITY_DELTA_120 > 0 ? formatNumber(plan?.data?.QUANTITY_DELTA_120, 1) : 0;
 
@@ -82,13 +88,6 @@ const PlanCard = ({ plan }) => {
         subscriptionHandler()
     }
 
-	function parseUpdateDate(){
-	    if(plan.updated_at && moment(plan.updated_at).isValid()){
-	        return `ב-${moment(plan.updated_at).format("DD.MM.YYYY")}`
-        }
-	    return ''
-    }
-
     const getDistanceText = (distance) => {
         const roundDistance = Math.ceil(distance / 5) * 5;
         if(distance < 1000 ) return  `${formatNumber(roundDistance)} מ׳ מהכתובת`;
@@ -105,9 +104,11 @@ const PlanCard = ({ plan }) => {
 					<SC.CardMedia title={plan.PL_NUMBER}>
 						<MapTitle>
                             <StatusChip>
-                                <StatusDot approved={plan.status === 'מאושרות'}/>
+                                <StatusDot isPermit={isBuildingPermit}/>
                                 <ChipText>
-                                    {`${plan.status ?? ''} ${parseUpdateDate()}`}
+                                    {isBuildingPermit
+                                        ? `היתר בניה · ${plan.status ?? ''}`
+                                        : getTypeLabel(plan)}
                                 </ChipText> 
                             </StatusChip>
 							<BookmarkBtn isBookmarked={isSubscribed} onClick={handleBookmarkClick}/>
@@ -140,8 +141,8 @@ const PlanCard = ({ plan }) => {
 						<PlanName>
                             {plan?.plan_display_name}
 						</PlanName>
-                        { plan?.goals_from_mavat && <PlanGoals>
-                            {plan?.goals_from_mavat.replace(/<\/?[^>]+(>|$)/g, "")}
+                        { (isBuildingPermit ? plan?.data?.requestType : plan?.goals_from_mavat) && <PlanGoals>
+                            {(isBuildingPermit ? plan.data.requestType : plan.goals_from_mavat).replace(/<\/?[^>]+(>|$)/g, "")}
                         </PlanGoals> }
 						{tags.length > 0 && <Tags ref={tagsWrapperRef}>
 							{tags.map((tag, i) => {
@@ -184,7 +185,6 @@ const Chip = styled.div`
 
 const StatusChip = styled(Chip)`
     padding: 4px 7px;
-    visibility: hidden;
 `;
 
 const ChipText = withTheme(styled.span`
@@ -199,7 +199,7 @@ const StatusDot = styled.div`
     flex-shrink: 0;
     margin-left: 7px;
     border-radius: 7px;
-    background: ${({ approved }) => approved ? '#1976D2' : '#AE7FF0'};
+    background: ${({ isPermit }) => isPermit ? '#E53935' : '#4CAF50'};
 `;
 
 const BookmarkBtn = styled.button`

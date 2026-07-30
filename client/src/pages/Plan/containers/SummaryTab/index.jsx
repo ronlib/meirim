@@ -8,6 +8,7 @@ import {
     HousingUnitPanel,
     SubscribePanel,
     MapPanel,
+    PermitDetailsPanel,
 } from 'pages/Plan/common';
 import { withGetScreen } from 'react-getscreen';
 import { useScrollToTop } from '../../hooks';
@@ -21,9 +22,25 @@ const SummaryTab = ({
 }) => {
     const { planData, dataArea, dataUnits, textArea, planLinks } =
         PlanSelectors();
-    const { type, status, lastUpdate, url, goalsFromMavat, countyName } =
-        planData;
+    const { type, status, lastUpdate, url, goalsFromMavat, countyName,
+        isBuildingPermit, permitData } = planData;
     useScrollToTop();
+
+    if (isBuildingPermit) {
+        return (
+            <>
+                <PermitDetailsPanel permitData={permitData} url={url} />
+                <GoalsPanel goalsFromMavat={goalsFromMavat} />
+                {isMobile() || isTablet() ? (
+                    <MapPanel geom={planData.geom} countyName={countyName} />
+                ) : null}
+                <SubscribePanel
+                    subscribePanel={subscribePanel}
+                    handleSubscribePanel={handleSubscribePanel}
+                />
+            </>
+        );
+    }
 
     return (
         <>

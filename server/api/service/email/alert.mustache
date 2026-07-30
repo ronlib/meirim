@@ -3,16 +3,16 @@
 
 <head>
   <title>
-    {{#data.PLAN_COUNTY_NAME}} תכנית חדשה ב{{{data.PLAN_COUNTY_NAME}}} {{/data.PLAN_COUNTY_NAME}} {{^data.PLAN_COUNTY_NAME}} תכנית
-    חדשה באזור העניין שלך {{/data.PLAN_COUNTY_NAME}} - {{{data.PL_NAME}}}</title>
+    {{#data.PLAN_COUNTY_NAME}} עדכון בנייה ב{{{data.PLAN_COUNTY_NAME}}} {{/data.PLAN_COUNTY_NAME}} {{^data.PLAN_COUNTY_NAME}} עדכון בנייה
+    באזור העניין שלך {{/data.PLAN_COUNTY_NAME}} - {{{data.PL_NAME}}}</title>
 </head>
 
 <body dir="rtl">
   <h2 class="headline">יש לך התראה חדשה!</h2>
   {{#data.PLAN_COUNTY_NAME}}
-    <h2 class="headline">תכנית חדשה ב{{data.PLAN_COUNTY_NAME}}</h2>
+    <h2 class="headline">עדכון בנייה ב{{data.PLAN_COUNTY_NAME}}</h2>
   {{/data.PLAN_COUNTY_NAME}} {{^data.PLAN_COUNTY_NAME}}
-    <h2 class="headline">תכנית חדשה באזור העניין שלך</h2>
+    <h2 class="headline">עדכון בנייה באזור העניין שלך</h2>
   {{/data.PLAN_COUNTY_NAME}}
 
   <a href="{{{link}}}?utm_medium=email&utm_source={{{type}}}"><h2 class="headline">{{data.PL_NAME}}</h2></a>

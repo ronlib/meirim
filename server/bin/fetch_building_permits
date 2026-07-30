@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+
+const { crawl, resolveSources, defaults, KIND } = require('../api/lib/building_permits/building_permits_tel_aviv');
+const Plan = require('../api/model/plan');
+const createStore = require('../api/lib/building_permits_adapter');
+const Log = require('../api/lib/log');
+const { runAndReport } = require('../metrics');
+
+const args = process.argv.slice(2);
+
+function flag(name) {
+	return args.includes(`--${name}`);
+}
+
+function option(name, fallback) {
+	const idx = args.indexOf(`--${name}`);
+	if (idx === -1 || idx + 1 >= args.length) return fallback;
+	return args[idx + 1];
+}
+
+const sourceSelector = option('source', 'all');
+const maxFeatures = option('max', undefined);
+const since = option('since', undefined);
+const dryRun = flag('dry-run');
+
+const sources = resolveSources(sourceSelector).filter(s => s.kind === KIND.PERMIT);
+const sourcesByName = new Map(sources.map(s => [s.name, s]));
+const store = createStore(Plan, Log, sourcesByName);
+const http = defaults.createHttp({ log: Log });
+
+runAndReport({
+	func: () => {
+		Log.info(`Building permits crawl: sources=${sourceSelector} max=${maxFeatures || 'all'} since=${since || 'any'} dryRun=${dryRun}`);
+
+		return crawl(
+			{ http, log: Log, store },
+			{
+				sources,
+				maxFeatures: maxFeatures ? parseInt(maxFeatures, 10) : undefined,
+				since,
+				dryRun,
+			}
+		).then(report => {
+			const t = report.totals;
+			Log.info(
+				`Done: ${t.fetched} fetched, ${t.saved} saved, ${t.updated} updated, ` +
+				`${t.changes} changes, ${t.imminent} imminent, ${t.failures} failures`
+			);
+			if (report.imminentChanges.length) {
+				Log.info(`Imminent construction alerts: ${report.imminentChanges.length}`);
+			}
+		});
+	},
+	name: 'fetch_building_permits',
+	timeout: 10 * 60 * 1000,
+});

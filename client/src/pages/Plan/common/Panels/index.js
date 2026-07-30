@@ -7,6 +7,7 @@ import DataPanel from './data';
 import DescriptionPanel from './description';
 import HousingUnitPanel from './housingUnit';
 import AreaUnitPanel from './areaUnit';
+import PermitDetailsPanel from './permitDetails';
 
 export { 
 	DetailsPanel,
@@ -17,5 +18,6 @@ export {
 	DataPanel,
 	DescriptionPanel,
 	HousingUnitPanel,
-	AreaUnitPanel
+	AreaUnitPanel,
+	PermitDetailsPanel
 };

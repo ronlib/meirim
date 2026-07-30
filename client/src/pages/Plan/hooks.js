@@ -82,6 +82,7 @@ export const useDataHandler = (planId) => {
 			const response = await getPlanData(planId);
 			const {
 				PLAN_COUNTY_NAME: countyName,
+				PLAN_CHARACTOR_NAME: planType,
 				plan_display_name: name,
 				PL_NAME: originalName,
 				jurisdiction,
@@ -102,6 +103,31 @@ export const useDataHandler = (planId) => {
 				STATION_DESC: stationDesc,
 				LAST_UPDATE: lastUpdate,
 			} = response.data.data;
+
+			const isBuildingPermit = planType === 'היתר בניה';
+
+			let permitData = null;
+			if (isBuildingPermit) {
+				const d = response.data.data;
+				permitData = {
+					kind: d.kind,
+					stage: d.stage,
+					stageOrder: d.stageOrder,
+					requestNumber: d.requestNumber,
+					permitNumber: d.permitNumber,
+					address: d.address,
+					housingUnits: d.housingUnits,
+					requestType: d.requestType,
+					requestContent: d.requestContent,
+					licensingTrack: d.licensingTrack,
+					tama38: d.tama38,
+					requestOpenedAt: d.requestOpenedAt,
+					permitGrantedAt: d.permitGrantedAt,
+					permitExpiresAt: d.permitExpiresAt,
+					constructionStartedAt: d.constructionStartedAt,
+				};
+			}
+
 			const newTextArea = {
 				...utils.initialTextArea,
 				area: geom ? Math.round(geojsonArea.geometry(geom)) : 0,
@@ -171,6 +197,8 @@ export const useDataHandler = (planId) => {
 						areaChanges,
 						geom,
 						originalName,
+						isBuildingPermit,
+						permitData,
 					},
 				})
 			);

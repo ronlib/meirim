@@ -184,7 +184,7 @@ const planToEmail = async (plan) => {
 const alertToEmail = (alert) => {
 	const nowDate = moment().format('DD-MM-YY');
 	const addressTitle = take((alert.get('address')|| '').split(','), 3).join(', ');
-	const alertTitle = `תוכניות חדשות בסביבת ${addressTitle ||  'תחומי הענין שלך'}`;
+	const alertTitle = `עדכוני בנייה בסביבת ${addressTitle ||  'תחומי הענין שלך'}`;
 	const mailSubject = `${alertTitle} | ${nowDate} `;
 	return {
 		alert: {

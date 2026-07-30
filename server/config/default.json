@@ -143,5 +143,10 @@
 	"planStatusChange": {
 		"limit": 15,
 		"lastVisitedDifference": 14
+	},
+	"buildingPermits": {
+		"enabled": true,
+		"pageSize": 1000,
+		"sources": ["tlv"]
 	}
 }
