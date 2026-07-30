@@ -18,6 +18,13 @@ const { formatDate } = require('../date');
 const mavatSearchPage = 'http://mavat.moin.gov.il/MavatPS/Forms/SV3.aspx?tid=3';
 const newMavatURL = 'https://mavat.iplan.gov.il/rest/api/SV4/1';
 
+const CHROMIUM_PATH = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+const PUPPETEER_LAUNCH_OPTS = {
+	headless: true,
+	args: ['--no-sandbox', '--disable-setuid-sandbox'],
+	...(fs.existsSync(CHROMIUM_PATH) ? { executablePath: CHROMIUM_PATH } : {}),
+};
+
 let browser = false;
 
 const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -30,11 +37,8 @@ const init = () =>
 		(async () => {
 			try {
 				if (!browser) {
-					Log.debug('Launching chrome');
-					browser = await puppeteer.launch({
-						headless: true,
-						args: ['--no-sandbox', '--disable-setuid-sandbox']
-					});
+					Log.debug('Launching chrome', { executablePath: PUPPETEER_LAUNCH_OPTS.executablePath || 'bundled' });
+					browser = await puppeteer.launch(PUPPETEER_LAUNCH_OPTS);
 					Log.debug('Success launching chrome');
 				}
 

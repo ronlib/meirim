@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 const Bluebird = require('bluebird');
 const Log = require('../../lib/log');
 
@@ -7,16 +8,21 @@ const SV3_PAGE_URL = 'https://mavat.iplan.gov.il/SV3';
 const PAGE_SIZE = 20;
 const TOKEN_REFRESH_INTERVAL = 5;
 
+const CHROMIUM_PATH = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+const PUPPETEER_LAUNCH_OPTS = {
+	headless: true,
+	args: ['--no-sandbox', '--disable-setuid-sandbox'],
+	...(fs.existsSync(CHROMIUM_PATH) ? { executablePath: CHROMIUM_PATH } : {}),
+};
+
 let browser = null;
 let page = null;
 let currentStrategy = null;
 
 const initBrowser = async () => {
 	if (!browser) {
-		browser = await puppeteer.launch({
-			headless: true,
-			args: ['--no-sandbox', '--disable-setuid-sandbox']
-		});
+		Log.info('[searchApi] Launching chrome', { executablePath: PUPPETEER_LAUNCH_OPTS.executablePath || 'bundled' });
+		browser = await puppeteer.launch(PUPPETEER_LAUNCH_OPTS);
 	}
 	return browser;
 };
