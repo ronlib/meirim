@@ -7,9 +7,17 @@ const { runAndReport } = require('../metrics');
 
 runAndReport({
 	func: async () => {
-		const dateLastStatusDate = await crawlCadence.calculateDateLastStatusDate();
-		Log.info(`Running mavatSearch with dateLastStatusDate=${dateLastStatusDate}`);
+		const STARTED_AT = Date.now();
+		Log.info('[run_mavat_search] Starting mavatSearch crawl');
+
+		const config = crawlCadence.getCrawlConfig();
+		Log.info(`[run_mavat_search] Crawl config: bufferDays=${config.bufferDays}, backfillSchedule=${config.backfillSchedule}, incrementalSchedule=${config.incrementalSchedule}`);
+
+		const dateLastStatusDate = await crawlCadence.calculateDateLastStatusDate(config.bufferDays);
+		Log.info(`[run_mavat_search] Mode: ${dateLastStatusDate === null ? 'BACKFILL (all plans)' : 'INCREMENTAL (since ' + dateLastStatusDate + ')'}`);
+
 		const result = await controller.mavatSearch(dateLastStatusDate);
-		Log.info(`mavatSearch completed: ${JSON.stringify(result)}`);
+		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
+		Log.info(`[run_mavat_search] mavatSearch completed in ${elapsed}s: ${JSON.stringify(result)}`);
 	}, name: 'mavatSearch'
 });

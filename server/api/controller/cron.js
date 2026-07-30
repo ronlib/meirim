@@ -40,13 +40,17 @@ const iplan = (limit = -1) =>
 		});
 
 const mavatSearch = async (dateLastStatusDate) => {
+	const STARTED_AT = Date.now();
 	Log.info('[cron] mavatSearch starting', { dateLastStatusDate });
 
 	const counts = { new: 0, changed: 0, unchanged: 0, errors: 0 };
 
 	try {
 		for await (const page of paginateAllPlans(dateLastStatusDate)) {
-			Log.info(`[cron] Processing page ${page.page} (${page.records.length} records)`);
+			const pageStart = Date.now();
+			Log.info(`[cron] Processing page ${page.page}/${page.totalPages} (${page.records.length} records)`);
+
+			let pageNew = 0, pageChanged = 0, pageUnchanged = 0, pageErrors = 0;
 
 			for (const record of page.records) {
 				try {
@@ -60,34 +64,42 @@ const mavatSearch = async (dateLastStatusDate) => {
 					const updateDate = record.UPDATE_DATE;
 
 					if (!existingPlan) {
-						Log.info(`[cron] New plan detected: MP_ID=${mpId}, Entity=${record.ENTITY_NUMBER}`);
+						Log.info(`[cron] New plan: MP_ID=${mpId}, Entity=${record.ENTITY_NUMBER}, UPDATE_DATE=${updateDate}`);
 						await createPlanFromSearchResult(record);
-						counts.new++;
+						counts.new++; pageNew++;
 					} else {
 						const storedUpdateDate = existingPlan.get('UPDATE_DATE');
 						if (storedUpdateDate !== updateDate) {
-							Log.info(`[cron] Changed plan: MP_ID=${mpId}, UPDATE_DATE: ${storedUpdateDate} -> ${updateDate}`);
+							Log.info(`[cron] Changed plan: MP_ID=${mpId}, Entity=${record.ENTITY_NUMBER}, UPDATE_DATE: ${storedUpdateDate} -> ${updateDate}`);
 							await updatePlanFromSearchResult(existingPlan, record);
-							counts.changed++;
+							counts.changed++; pageChanged++;
 						} else {
-							counts.unchanged++;
+							Log.debug(`[cron] Unchanged plan: MP_ID=${mpId}, Entity=${record.ENTITY_NUMBER}, UPDATE_DATE=${updateDate}`);
+							counts.unchanged++; pageUnchanged++;
 						}
 					}
 				} catch (e) {
-					Log.error(`[cron] Error processing SV3 record`, { mpId: record.MP_ID, error: e.message });
-					counts.errors++;
+					Log.error(`[cron] Error processing SV3 record`, { mpId: record.MP_ID, entityNumber: record.ENTITY_NUMBER, error: e.message });
+					counts.errors++; pageErrors++;
 				}
 			}
+
+			const pageElapsed = ((Date.now() - pageStart) / 1000).toFixed(1);
+			Log.info(`[cron] Page ${page.page} summary: ${pageNew} new, ${pageChanged} changed, ${pageUnchanged} unchanged, ${pageErrors} errors (${pageElapsed}s)`);
 		}
 	} catch (e) {
 		Log.error('[cron] mavatSearch failed', e);
 	}
 
-	Log.info(`[cron] mavatSearch complete: ${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.errors} errors`);
+	const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
+	Log.info(`[cron] mavatSearch complete: ${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.errors} errors (${elapsed}s)`);
 	return counts;
 };
 
 const createPlanFromSearchResult = async (record) => {
+	const STARTED_AT = Date.now();
+	Log.info(`[cron] Creating new plan from SV3: MP_ID=${record.MP_ID}, Entity=${record.ENTITY_NUMBER}, UPDATE_DATE=${record.UPDATE_DATE}`);
+
 	const planData = {
 		MP_ID: record.MP_ID,
 		UPDATE_DATE: record.UPDATE_DATE,
@@ -108,11 +120,19 @@ const createPlanFromSearchResult = async (record) => {
 
 	const plan = new Plan(planData);
 	await plan.save();
+	Log.info(`[cron] Plan record created: id=${plan.id}, MP_ID=${record.MP_ID}, Entity=${record.ENTITY_NUMBER} (${Date.now() - STARTED_AT}ms)`);
+
 	await enrichPlanFromMavat(plan);
+	Log.info(`[cron] New plan fully processed: id=${plan.id}, MP_ID=${record.MP_ID} (${Date.now() - STARTED_AT}ms total)`);
 	return plan;
 };
 
 const updatePlanFromSearchResult = async (existingPlan, record) => {
+	const STARTED_AT = Date.now();
+	const planId = existingPlan.id;
+	const oldUpdate = existingPlan.get('UPDATE_DATE');
+	Log.info(`[cron] Updating plan ${planId} from SV3: MP_ID=${record.MP_ID}, UPDATE_DATE: ${oldUpdate} -> ${record.UPDATE_DATE}`);
+
 	existingPlan.set({
 		UPDATE_DATE: record.UPDATE_DATE,
 		PL_NUMBER: record.ENTITY_NUMBER,
@@ -127,22 +147,35 @@ const updatePlanFromSearchResult = async (existingPlan, record) => {
 	existingPlan.set('data', existingData);
 
 	await existingPlan.save();
+	Log.info(`[cron] Plan ${planId} SV3 fields saved (${Date.now() - STARTED_AT}ms)`);
+
 	await enrichPlanFromMavat(existingPlan);
+	Log.info(`[cron] Plan ${planId} fully updated (${Date.now() - STARTED_AT}ms total)`);
 	return existingPlan;
 };
 
 const enrichPlanFromMavat = async (plan) => {
+	const planId = plan.id;
+	const mpId = plan.get('MP_ID');
+	const plNumber = plan.get('PL_NUMBER');
+	const STARTED_AT = Date.now();
+	Log.info(`[cron] Enriching plan ${planId} from Mavat SV4/1: MP_ID=${mpId}, PL_NUMBER=${plNumber}`);
+
 	try {
 		const mavatData = await MavatAPI.getByPlan(plan);
 		if (mavatData) {
 			await Plan.setMavatData(plan, mavatData);
+			Log.info(`[cron] Mavat enrichment complete for plan ${planId}: ${Date.now() - STARTED_AT}ms`);
+		} else {
+			Log.warn(`[cron] Mavat enrichment returned no data for plan ${planId} (${Date.now() - STARTED_AT}ms)`);
 		}
 	} catch (e) {
-		Log.error(`[cron] Mavat enrichment failed for plan ${plan.get('id')}`, e);
+		Log.error(`[cron] Mavat enrichment failed for plan ${planId} (MP_ID=${mpId}, PL_NUMBER=${plNumber})`, e);
 	}
 };
 
 const fetchIplanGeometry = async () => {
+	const STARTED_AT = Date.now();
 	Log.info('[cron] fetchIplanGeometry: fetching geometry for plans missing geometry');
 
 	try {
@@ -153,18 +186,31 @@ const fetchIplanGeometry = async () => {
 		Log.info(`[cron] Found ${plansNeedingGeometry.length} plans needing geometry`);
 
 		let successCount = 0;
+		let skipCount = 0;
 		for (const plan of plansNeedingGeometry) {
+			const planId = plan.id;
 			const plNumber = plan.get('PL_NUMBER');
-			if (!plNumber) continue;
+			if (!plNumber) {
+				Log.warn(`[cron] Skipping plan ${planId}: no PL_NUMBER`);
+				skipCount++;
+				continue;
+			}
 
+			const t0 = Date.now();
+			Log.info(`[cron] Fetching geometry for plan ${planId}: PL_NUMBER=${plNumber}`);
 			const geoData = await iplanApi.getPlanGeometry(plNumber);
 			if (geoData) {
 				await Plan.buildFromIPlan(geoData, plan);
+				const newMpId = plan.get('MP_ID');
+				Log.info(`[cron] Geometry saved for plan ${planId}: PL_NUMBER=${plNumber}, MP_ID=${newMpId} (${Date.now() - t0}ms)`);
 				successCount++;
+			} else {
+				Log.warn(`[cron] No geometry returned for plan ${planId}: PL_NUMBER=${plNumber} (${Date.now() - t0}ms)`);
 			}
 		}
 
-		Log.info(`[cron] fetchIplanGeometry complete: ${successCount}/${plansNeedingGeometry.length} plans updated`);
+		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
+		Log.info(`[cron] fetchIplanGeometry complete: ${successCount} updated, ${skipCount} skipped, ${plansNeedingGeometry.length} total (${elapsed}s)`);
 		return successCount;
 	} catch (e) {
 		Log.error('[cron] fetchIplanGeometry failed', e);
