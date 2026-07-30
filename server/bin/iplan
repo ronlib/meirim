@@ -1,16 +1,35 @@
 #!/usr/bin/env node
 
+// PATCH: this entry point used to run the old controller.iplan() blue-lines crawler.
+// It now runs the same logic as bin/run_mavat_search so that production's existing
+// cron line (`*/40 * * * * ... bin/iplan`, see README.md) picks up the new incremental
+// crawler without needing a devops change to the crontab. Once the crontab is updated
+// to call bin/run_mavat_search directly, this file can be deleted and bin/iplan removed
+// from README.md and package.json's `crawl` script.
+
 const controller = require('../api/controller/cron');
+const crawlCadence = require('../api/lib/crawlCadence');
 const Log = require('../api/lib/log');
 const { runAndReport } = require('../metrics');
 
-
 runAndReport({
-	func: () => {
-		return controller.iplan().then(async () => {
-			Log.info('iplan completed');
-		})
-			.finally(() => process.exit());
+	func: async () => {
+		const STARTED_AT = Date.now();
+		Log.info('[run_mavat_search] Starting mavatSearch crawl');
+
+		const config = crawlCadence.getCrawlConfig();
+		Log.info(`[run_mavat_search] Crawl config: bufferDays=${config.bufferDays}, backfillSchedule=${config.backfillSchedule}, incrementalSchedule=${config.incrementalSchedule}`);
+
+		const dateLastStatusDate = await crawlCadence.calculateDateLastStatusDate(config.bufferDays);
+		Log.info(`[run_mavat_search] Mode: ${dateLastStatusDate === null ? 'BACKFILL (all plans)' : 'INCREMENTAL (since ' + dateLastStatusDate + ')'}`);
+
+		const result = await controller.mavatSearch(dateLastStatusDate);
+		if (result && result.errors === 0) {
+			await crawlCadence.setLastSuccessfulCrawlDate();
+		} else {
+			Log.warn(`[run_mavat_search] last crawl date was NOT updated due to errors: ${result && result.errors}`);
+		}
+		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
+		Log.info(`[run_mavat_search] mavatSearch completed in ${elapsed}s: ${JSON.stringify(result)}`);
 	}, name: 'iplan'
 });
-
