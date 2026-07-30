@@ -92,3 +92,20 @@ docker exec \
   -w /app \
   meirim-dev node server/bin/iplan
 ```
+
+
+docker exec -it \
+  -e NODE_CONFIG_DIR=/app/server/config \
+  -e NODE_OPTIONS=--openssl-legacy-provider \
+  -e SERVER_CORALOGIX_API_KEY=abc \
+  -e SERVER_CORALOGIX_SERVICE_NAME=dev \
+  -e SERVER_CYPHER_SECRET=abc \
+  -e SERVER_DATABASE_HOST=host.docker.internal \
+  -e SERVER_DATABASE_PASSWORD=password \
+  -e SERVER_DATABASE_USER=root \
+  -e SERVER_GEOCODER_API_KEY= \
+  -e SERVER_PROXY_API_KEY= \
+  -e SERVER_SENTRY_DSN= \
+  -e SERVER_SESSION_SECRET=dev-secret \
+  -e NODE_CONFIG_DIR=/app/client/config \
+  meirim-dev bash
