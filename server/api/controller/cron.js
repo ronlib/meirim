@@ -89,6 +89,7 @@ const mavatSearch = async (dateLastStatusDate) => {
 		}
 	} catch (e) {
 		Log.error('[cron] mavatSearch failed', e);
+		throw e;
 	}
 
 	const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);

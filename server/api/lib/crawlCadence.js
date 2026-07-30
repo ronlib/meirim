@@ -1,16 +1,14 @@
 const moment = require('moment');
 const Log = require('./log');
 
-const BACKFILL_BUFFER_KEY = 'crawl:backfill_complete';
-const LAST_CRAWL_KEY = 'crawl:last_crawl_date';
-
 const DEFAULT_BUFFER_DAYS = 7;
+const LAST_SUCCESSFUL_MAVAT_CRAWL_KEY = 'last_successful_mavat_crawl';
 
 const getLastCrawlDate = async () => {
 	Log.info('[crawlCadence] Querying last successful crawl date from crawl_meta');
 	const { Knex } = require('../service/database');
 	try {
-		const row = await Knex('crawl_meta').where({ key: 'last_successful_mavat_crawl' }).first();
+		const row = await Knex('crawl_meta').where({ key: LAST_SUCCESSFUL_MAVAT_CRAWL_KEY }).first();
 		return row?.value || null;
 	} catch (e) {
 		Log.warn(`[crawlCadence] Could not determine last crawl date: ${e.message}`, { stack: e.stack });
@@ -24,11 +22,21 @@ const setLastSuccessfulCrawlDate = async () => {
 	Log.info(`[crawlCadence] Setting last successful mavat crawl date to ${dateStr}`);
 	const { Knex } = require('../service/database');
 	try {
-		await Knex('crawl_meta')
-			.where({ key: 'last_successful_mavat_crawl' })
-			.update({ value: dateStr, updated_at: Knex.fn.now() });
+		const rowsAffected = await Knex('crawl_meta')
+			.insert({
+				key: LAST_SUCCESSFUL_MAVAT_CRAWL_KEY,
+				value: dateStr,
+				updated_at: Knex.fn.now(),
+			})
+			.onConflict('key')
+			.merge({
+				value: dateStr,
+				updated_at: Knex.fn.now(),
+			});
+		Log.info(`[crawlCadence] Successfully set last crawl date to ${dateStr}`, { rowsAffected });
 	} catch (e) {
-		Log.warn(`[crawlCadence] Could not set last crawl date: ${e.message}`, { stack: e.stack });
+		Log.error(`[crawlCadence] Could not set last crawl date: ${e.message}`, { stack: e.stack });
+		throw e;
 	}
 };
 
