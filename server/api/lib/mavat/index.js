@@ -11,6 +11,7 @@ const fs = require('fs');
 const { getFileUrl, formatFile } = require('./files');
 const { clearOldPlanFiles, processPlanInstructionsFile } = require('./planInstructions/');
 const { downloadChallengedFile } = require('../challanged-file');
+const searchApi = require('./searchApi');
 const PlanStatusChange = require('../../model/plan_status_change');
 const { formatDate } = require('../date');
 const proxy = require('../proxy');
@@ -418,6 +419,8 @@ module.exports = {
 	init,
 	fetch,
 	getPlanStatus,
+	searchPlans: searchApi.searchPlans,
+	paginateAllPlans: searchApi.paginateAllPlans,
 
 	// exported for tests
 	testOnly: {
