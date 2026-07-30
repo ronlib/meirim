@@ -101,6 +101,7 @@ const createPlanFromSearchResult = async (record) => {
 	Log.info(`[cron] Creating new plan from SV3: MP_ID=${record.MP_ID}, Entity=${record.ENTITY_NUMBER}, UPDATE_DATE=${record.UPDATE_DATE}`);
 
 	const planData = {
+		OBJECTID: 0,
 		MP_ID: record.MP_ID,
 		UPDATE_DATE: record.UPDATE_DATE,
 		PL_NUMBER: record.ENTITY_NUMBER,

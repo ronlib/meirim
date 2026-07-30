@@ -18,6 +18,7 @@ const { drawStaticMapWithPolygon } = require('../service/staticmap');
 const Tag = require('./tag');
 const StaticMap = require('./staticmap');
 const wkt = require('terraformer-wkt-parser');
+const centroid = require('turf').centroid;
 
 class Plan extends Model {
 	get rules () {
@@ -104,20 +105,19 @@ class Plan extends Model {
 
 	_creating (model) {
 		return new Promise((resolve) => {
-			// set the geometry's centroid using ST_Centroid function
-			//TODO: return this after the MP_ID migration
-			model.set('geom_centroid', Knex.raw('ST_Centroid(geom)'));
+			const geom = model.get('geom');
+			if (geom) {
+				model.set('geom_centroid', geom.type === 'Point' ? geom : centroid(geom).geometry);
+			}
 			resolve();
 		});
 	}
 
 	_updating (model, attrs) {
 		return new Promise((resolve) => {
-			// if the geometry is being updated update the centroid as well,
-			// otherwise never update the centroid since the value is not
-			// parsed and formatted like the geometry value is
 			if (attrs.geom !== undefined) {
-				model.set('geom_centroid', Knex.raw('ST_Centroid(geom)'));
+				const geom = attrs.geom;
+				model.set('geom_centroid', geom.type === 'Point' ? geom : centroid(geom).geometry);
 			} else {
 				model.unset('geom_centroid');
 			}
