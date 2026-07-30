@@ -23,6 +23,7 @@ const PlanStruct = function(table) {
 	table.boolean('geo_search_filter');
 	table.string('plan_display_name', 256);
 	table.string('MP_ID', 256);
+	table.text('UPDATE_DATE');
 	table.string('plan_new_mavat_url', 256);
 	table.timestamp('last_visited_status');
 	table.integer('was_deposited').defaultTo(0);

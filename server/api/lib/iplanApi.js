@@ -117,16 +117,53 @@ const getBlueLines = async () => {
 
 };
 
+const getPlanGeometry = async (planNumber) => {
+	const encodedNumber = encodeURIComponent(planNumber);
+	const url = `${BASE_AGS_URL}/1/query?f=json&outFields=objectid,shape,plan_county_name,entity_subtype_desc,pl_number,pl_name,pl_url,mp_id,last_update&returnGeometry=true&where=PL_NUMBER='${encodedNumber}'&outSR=3857`;
+	Log.info(`Fetching geometry for plan ${planNumber}`);
+	try {
+		const response = await axios.get(url, options);
+		if (!response.data || !response.data.features || response.data.features.length === 0) {
+			Log.warn(`No geometry found for plan ${planNumber}`);
+			return null;
+		}
+		const feature = response.data.features[0];
+		const geojson = GeoJSON.fromEsri({ features: [feature] }, {});
+		const datum = geojson.features[0];
+		for (let prop in datum.properties) {
+			datum.properties[prop.toUpperCase()] = datum.properties[prop];
+			delete datum.properties[prop];
+		}
+		const agamId = datum.properties.MP_ID || getPlanMPID(datum.properties.PL_URL);
+		if (agamId) {
+			datum.properties.MP_ID = agamId;
+			datum.properties.plan_new_mavat_url = datum.properties.PL_URL;
+		}
+		datum.geometry = reproject.toWgs84(datum.geometry, EPSG3857);
+		return datum;
+	} catch (error) {
+		Log.error(`Failed getting geometry for plan ${planNumber}`, error);
+		return null;
+	}
+};
+
+const backfillMissingGeometry = async () => {
+	Log.info('Starting backfill of missing plan geometry');
+	const plans = await getBlueLines();
+	Log.info(`Backfill complete: ${plans.length} plans with geometry`);
+	return plans;
+};
+
 const getPlanningCouncils = () => {
 	const url = `${BASE_AGS_URL}/2/query?f=json&outFields=CodeMT,MT_Heb&returnGeometry=false&where=OBJECTID%3E0`;
 	Log.debug('Fetch', url);
-	const requestOptions = _.clone(options);
-	requestOptions.uri = url;
-	return Request(requestOptions);
+	return axios.get(url, options).then(res => res.data);
 };
 
 module.exports = {
 	getBlueLines,
+	getPlanGeometry,
+	backfillMissingGeometry,
 	getPlanningCouncils,
 	buildMavatURL
 };

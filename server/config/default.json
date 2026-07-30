@@ -31,9 +31,15 @@
 		"domain": "https://meirim.org/",
 		"trustProxy": 1
 	},
+	"crawl": {
+		"bufferDays": 7,
+		"backfillGuard": true
+	},
 	"services": {
 		"schedule": {
 			"iplan": "0 0 0 * * *",
+			"backfillCrawl": "0 0 2 * * 0",
+			"incrementalCrawl": "0 */6 * * *",
 			"sendPlanningAlerts": "0 0 0 * * *",
 			"sendDigestPlanningAlerts": "*/1 * * * *"
 		}
@@ -86,7 +92,7 @@
 			"client": "mysql",
 			"connection": {
 				"host": "localhost",
-				"port": 33060,
+				"port": 3306,
 				"user": "root",
 				"password": "password",
 				"database": "test_meirim",

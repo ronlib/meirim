@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+const controller = require('../api/controller/cron');
+const crawlCadence = require('../api/lib/crawlCadence');
+const Log = require('../api/lib/log');
+const { runAndReport } = require('../metrics');
+
+runAndReport({
+	func: async () => {
+		const dateLastStatusDate = await crawlCadence.calculateDateLastStatusDate();
+		Log.info(`Running mavatSearch with dateLastStatusDate=${dateLastStatusDate}`);
+		const result = await controller.mavatSearch(dateLastStatusDate);
+		Log.info(`mavatSearch completed: ${JSON.stringify(result)}`);
+	}, name: 'mavatSearch'
+});

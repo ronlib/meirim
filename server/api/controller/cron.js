@@ -13,6 +13,7 @@ const PlanPerson = require('../model/plan_person');
 const Email = require('../service/email');
 const DigestEmail = require('../service/template_email');
 const MavatAPI = require('../lib/mavat');
+const { paginateAllPlans } = require('../lib/mavat');
 const { fetchStaticMap } = require('../service/staticmap');
 const { crawlTrees } = require('../lib/trees/tree_crawler');
 const TreePermit = require('../model/tree_permit');
@@ -37,6 +38,139 @@ const iplan = (limit = -1) =>
 		}).catch(e => {
 			Log.error('Error fetching new plans', e);
 		});
+
+const mavatSearch = async (dateLastStatusDate) => {
+	Log.info('[cron] mavatSearch starting', { dateLastStatusDate });
+
+	const counts = { new: 0, changed: 0, unchanged: 0, errors: 0 };
+
+	try {
+		for await (const page of paginateAllPlans(dateLastStatusDate)) {
+			Log.info(`[cron] Processing page ${page.page} (${page.records.length} records)`);
+
+			for (const record of page.records) {
+				try {
+					const mpId = record.MP_ID;
+					if (!mpId) {
+						Log.warn('[cron] Record without MP_ID, skipping');
+						continue;
+					}
+
+					const existingPlan = await Plan.forge({ MP_ID: mpId }).fetch();
+					const updateDate = record.UPDATE_DATE;
+
+					if (!existingPlan) {
+						Log.info(`[cron] New plan detected: MP_ID=${mpId}, Entity=${record.ENTITY_NUMBER}`);
+						await createPlanFromSearchResult(record);
+						counts.new++;
+					} else {
+						const storedUpdateDate = existingPlan.get('UPDATE_DATE');
+						if (storedUpdateDate !== updateDate) {
+							Log.info(`[cron] Changed plan: MP_ID=${mpId}, UPDATE_DATE: ${storedUpdateDate} -> ${updateDate}`);
+							await updatePlanFromSearchResult(existingPlan, record);
+							counts.changed++;
+						} else {
+							counts.unchanged++;
+						}
+					}
+				} catch (e) {
+					Log.error(`[cron] Error processing SV3 record`, { mpId: record.MP_ID, error: e.message });
+					counts.errors++;
+				}
+			}
+		}
+	} catch (e) {
+		Log.error('[cron] mavatSearch failed', e);
+	}
+
+	Log.info(`[cron] mavatSearch complete: ${counts.new} new, ${counts.changed} changed, ${counts.unchanged} unchanged, ${counts.errors} errors`);
+	return counts;
+};
+
+const createPlanFromSearchResult = async (record) => {
+	const planData = {
+		MP_ID: record.MP_ID,
+		UPDATE_DATE: record.UPDATE_DATE,
+		PL_NUMBER: record.ENTITY_NUMBER,
+		PL_NAME: record.ENTITY_NAME || '',
+		plan_display_name: record.ENTITY_NAME ? Plan.cleanPlanName(record.ENTITY_NAME) : '',
+		status: record.INTERNET_SHORT_STATUS || '',
+		data: { SV3_UPDATE_DATE: record.UPDATE_DATE, SV3_STATUS: record.INTERNET_SHORT_STATUS, SV3_UNIFIED_STATUS: record.UNIFIED_STATUS_DESC },
+		PLAN_COUNTY_NAME: '',
+		PLAN_CHARACTOR_NAME: '',
+		geom: { type: 'Point', coordinates: [0, 0] },
+		sent: 0,
+		geo_search_filter: false,
+		rating: 0,
+		views: 0,
+		erosion_views: 0,
+	};
+
+	const plan = new Plan(planData);
+	await plan.save();
+	await enrichPlanFromMavat(plan);
+	return plan;
+};
+
+const updatePlanFromSearchResult = async (existingPlan, record) => {
+	existingPlan.set({
+		UPDATE_DATE: record.UPDATE_DATE,
+		PL_NUMBER: record.ENTITY_NUMBER,
+		PL_NAME: record.ENTITY_NAME || existingPlan.get('PL_NAME'),
+		status: record.INTERNET_SHORT_STATUS || existingPlan.get('status'),
+	});
+
+	const existingData = existingPlan.get('data') || {};
+	existingData.SV3_UPDATE_DATE = record.UPDATE_DATE;
+	existingData.SV3_STATUS = record.INTERNET_SHORT_STATUS;
+	existingData.SV3_UNIFIED_STATUS = record.UNIFIED_STATUS_DESC;
+	existingPlan.set('data', existingData);
+
+	await existingPlan.save();
+	await enrichPlanFromMavat(existingPlan);
+	return existingPlan;
+};
+
+const enrichPlanFromMavat = async (plan) => {
+	try {
+		const mavatData = await MavatAPI.getByPlan(plan);
+		if (mavatData) {
+			await Plan.setMavatData(plan, mavatData);
+		}
+	} catch (e) {
+		Log.error(`[cron] Mavat enrichment failed for plan ${plan.get('id')}`, e);
+	}
+};
+
+const fetchIplanGeometry = async () => {
+	Log.info('[cron] fetchIplanGeometry: fetching geometry for plans missing geometry');
+
+	try {
+		const { models: plansNeedingGeometry } = await Plan.query(qb => {
+			qb.whereRaw('(geom IS NULL OR MP_ID IS NULL OR MP_ID = \'\')');
+		}).fetchAll();
+
+		Log.info(`[cron] Found ${plansNeedingGeometry.length} plans needing geometry`);
+
+		let successCount = 0;
+		for (const plan of plansNeedingGeometry) {
+			const plNumber = plan.get('PL_NUMBER');
+			if (!plNumber) continue;
+
+			const geoData = await iplanApi.getPlanGeometry(plNumber);
+			if (geoData) {
+				await Plan.buildFromIPlan(geoData, plan);
+				successCount++;
+			}
+		}
+
+		Log.info(`[cron] fetchIplanGeometry complete: ${successCount}/${plansNeedingGeometry.length} plans updated`);
+		return successCount;
+	} catch (e) {
+		Log.error('[cron] fetchIplanGeometry failed', e);
+		return 0;
+	}
+};
 
 const fix_geodata = () => {
 	return iplanApi.getBlueLines().then(iPlans =>
@@ -586,6 +720,8 @@ const fillMPIDForMissingPlans = async () => {
 
 module.exports = {
 	iplan,
+	mavatSearch,
+	fetchIplanGeometry,
 	complete_mavat_data,
 	sendPlanningAlerts,
 	complete_jurisdiction_from_mavat,

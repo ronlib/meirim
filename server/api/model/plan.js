@@ -28,6 +28,7 @@ class Plan extends Model {
 			PL_NUMBER: 'string',
 			PL_NAME: 'string',
 			MP_ID: 'integer',
+			UPDATE_DATE: 'string',
 			plan_display_name: 'string',
 			PLAN_CHARACTOR_NAME: 'string',
 			data: ['required'],

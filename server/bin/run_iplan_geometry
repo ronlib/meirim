@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+const controller = require('../api/controller/cron');
+const Log = require('../api/lib/log');
+const { runAndReport } = require('../metrics');
+
+runAndReport({
+	func: async () => {
+		Log.info('Running fetchIplanGeometry');
+		const count = await controller.fetchIplanGeometry();
+		Log.info(`fetchIplanGeometry completed: ${count} plans updated`);
+	}, name: 'fetchIplanGeometry'
+});

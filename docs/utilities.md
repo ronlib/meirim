@@ -24,8 +24,24 @@ $ npm run serve # or node bin/serve
 
 ## Complete mavat data
 
-The [complete_mavat_data](../server/bin/complete_mavat_data) utility is used to repair missing data due to downtime, errors etc. or due to new data processing code being introduced. It is further explained [here](./crawler.md#complete-mavat-data).
+The [complete_mavat_data](../server/bin/complete_mavat_data) utility is used to repair missing data due to downtime, errors etc. or due to new data processing code being introduced. It is further explained [here](./crawler.md#crawling-process-data-pipeline).
 
 ```bash
 $ node bin/complete_mavat_data
+```
+
+## SV3 search crawl
+
+The [run_mavat_search](../server/bin/run_mavat_search) utility runs the Mavat SV3 search-based crawl. It automatically detects whether a backfill (fetch all plans) or incremental (fetch recently updated plans) run is needed based on database state and the last crawl date.
+
+```bash
+$ node bin/run_mavat_search
+```
+
+## IPlan geometry fetch
+
+The [run_iplan_geometry](../server/bin/run_iplan_geometry) utility fetches geometry from the IPlan ArcGIS service for plans that are missing geometry or MP_ID. Unlike the legacy `npm run crawl` (which does a full dump of all plans), this only queries per-plan for those that need it.
+
+```bash
+$ node bin/run_iplan_geometry
 ```
