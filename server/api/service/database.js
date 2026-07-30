@@ -3,7 +3,7 @@ const log = require('../lib/log')
 
 const Knex = require('knex');
 
-const env = 'database';
+const env = process.env.NODE_ENV === 'test' ? 'test.database' : 'database'; /// hack, should be fixed
 
 const KnexConnection = Knex({
 	client: Config.get(`${env}.client`),
