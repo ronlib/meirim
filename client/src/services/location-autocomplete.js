@@ -1,36 +1,55 @@
+const MAPS_SRC_PREFIX = 'https://maps.googleapis.com/maps/api/js';
+
 const loadScript = (url, callback) => {
-    let script = document.createElement('script');
+    const existing = document.querySelector(`script[src^="${MAPS_SRC_PREFIX}"]`);
+    if (existing) {
+        if (window.google) {
+            callback();
+            return;
+        }
+        existing.addEventListener('load', () => callback());
+        return;
+    }
+    const script = document.createElement('script');
     script.type = 'text/javascript';
 
     if (script.readyState) {
-      script.onreadystatechange = function() {
-        if (script.readyState === 'loaded' || script.readyState === 'complete') {
-          script.onreadystatechange = null;
-          callback();
-        }
-      };
+        script.onreadystatechange = function() {
+            if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                script.onreadystatechange = null;
+                callback();
+            }
+        };
     } else {
-      script.onload = () => callback();
+        script.onload = () => callback();
     }
 
     script.src = url;
     document.getElementsByTagName('head')[0].appendChild(script);
 };
 
+let loadPromise = null;
+
 module.exports.init = () => {
-    return new Promise((resolve, reject) => {
-        if (window.google) {
-            resolve(window.google);
-        } else {
-            loadScript(`https://maps.googleapis.com/maps/api/js?language=iw&libraries=places&key=${process.env.CONFIG.geocode.mapsApiKey}`, () => {
-                if (window.google) {
-                    resolve(window.google);
-                } else {
-                    reject('failed to load google library');
-                }
-            });
-        }
+    if (window.google) {
+        return Promise.resolve(window.google);
+    }
+    if (loadPromise) {
+        return loadPromise;
+    }
+    loadPromise = new Promise((resolve, reject) => {
+        loadScript(`https://maps.googleapis.com/maps/api/js?language=iw&libraries=places&key=${process.env.CONFIG.geocode.mapsApiKey}`, () => {
+            if (window.google) {
+                resolve(window.google);
+            } else {
+                reject('failed to load google library');
+            }
+        });
+    }).catch((err) => {
+        loadPromise = null;
+        throw err;
     });
+    return loadPromise;
 };
 
 module.exports.autocomplete = (input) => {
