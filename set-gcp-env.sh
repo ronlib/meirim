@@ -1,2 +1,0 @@
-export GOOGLE_APPLICATION_CREDENTIALS=/Users/ronliberman/.config/gcloud/application_default_credentials.json
-export GOOGLE_CLOUD_PROJECT=qwiklabs-gcp-00-c4882e4bf1b0
