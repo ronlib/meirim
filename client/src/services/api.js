@@ -5,6 +5,26 @@ const instance = axios.create({
 	"withCredentials": true
 })
 
+instance.interceptors.request.use((config) => {
+	console.log('[API]', config.method.toUpperCase(), config.baseURL + config.url, config.params || config.data || '')
+	return config
+})
+
+instance.interceptors.response.use(
+	(response) => {
+		console.log('[API]', response.status, response.config.url)
+		return response
+	},
+	(error) => {
+		if (error.response) {
+			console.error('[API] ERROR', error.response.status, error.response.config.url, error.response.data)
+		} else {
+			console.error('[API] ERROR', error.message)
+		}
+		return Promise.reject(error)
+	}
+)
+
 export default {
 	get: (path, data, options) => instance.get(path, { params: data }, options)
 		.then(results => results.data),

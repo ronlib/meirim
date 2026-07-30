@@ -32,33 +32,40 @@ module.exports = (bookshelf) => {
 			// // Parse geometry columns to GeoJSON
 			if (this.geometry) {
 				this.geometry.forEach((attr) => {
-					if (attributes[attr] && Array.isArray(attributes[attr])) {
-						const json = [];
-						if (attributes[attr][0] && attributes[attr][0][0] && attributes[attr][0][0][0]) {
-							attributes[attr].map((att, i) => {
-								json[i] = [];
-								att.map((el, k) => {
-									json[i][k] = [];
-									el.length > 0 && el.map((elj, j) => {
-										json[i][k][j] = [elj.x, elj.y];
+					if (attributes[attr]) {
+						if (Array.isArray(attributes[attr])) {
+							const json = [];
+							if (attributes[attr][0] && attributes[attr][0][0] && attributes[attr][0][0][0]) {
+								attributes[attr].map((att, i) => {
+									json[i] = [];
+									att.map((el, k) => {
+										json[i][k] = [];
+										el.length > 0 && el.map((elj, j) => {
+											json[i][k][j] = [elj.x, elj.y];
+										});
 									});
 								});
-							});
 
-							attributes[attr] = {
-								type: 'MultiPolygon',
-								coordinates: json
-							};
-						} else {
-							attributes[attr].map((el, i) => {
-								json[i] = [];
-								el.length > 0 && el.map((elj, j) => {
-									json[i][j] = [elj.x, elj.y];
+								attributes[attr] = {
+									type: 'MultiPolygon',
+									coordinates: json
+								};
+							} else {
+								attributes[attr].map((el, i) => {
+									json[i] = [];
+									el.length > 0 && el.map((elj, j) => {
+										json[i][j] = [elj.x, elj.y];
+									});
 								});
-							});
+								attributes[attr] = {
+									type: 'Polygon',
+									coordinates: json
+								};
+							}
+						} else if (typeof attributes[attr].x === 'number' && typeof attributes[attr].y === 'number') {
 							attributes[attr] = {
-								type: 'Polygon',
-								coordinates: json
+								type: 'Point',
+								coordinates: [attributes[attr].x, attributes[attr].y]
 							};
 						}
 					}
