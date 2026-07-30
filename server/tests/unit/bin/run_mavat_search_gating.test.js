@@ -12,6 +12,7 @@ describe('run_mavat_search gating', function() {
 	let metrics;
 	let setLastStub;
 	let mavatSearchStub;
+	let fetchGeomStub;
 	let logWarnStub;
 	let lastRunPromise;
 
@@ -31,9 +32,11 @@ describe('run_mavat_search gating', function() {
 		sinon.stub(crawlCadence, 'calculateDateLastStatusDate').resolves(null);
 		setLastStub = sinon.stub(crawlCadence, 'setLastSuccessfulCrawlDate').resolves();
 		mavatSearchStub = sinon.stub(controller, 'mavatSearch');
+		fetchGeomStub = sinon.stub(controller, 'fetchIplanGeometry').resolves(0);
 		logWarnStub = sinon.stub(Log, 'warn');
 		sinon.stub(Log, 'info');
 		sinon.stub(Log, 'error');
+		sinon.stub(metrics, 'report');
 		sinon.stub(metrics, 'runAndReport').callsFake(({ func }) => {
 			lastRunPromise = (async () => {
 				try {
@@ -86,5 +89,32 @@ describe('run_mavat_search gating', function() {
 		expect(result).to.be.instanceOf(Error);
 		expect(result.message).to.equal('catastrophic');
 		expect(setLastStub.called).to.equal(false);
+	});
+
+	it('calls fetchIplanGeometry after a successful crawl (errors === 0)', async function() {
+		mavatSearchStub.resolves({ new: 1, changed: 0, unchanged: 0, errors: 0 });
+		await loadAndRunBin();
+		expect(fetchGeomStub.calledOnce).to.equal(true);
+	});
+
+	it('calls fetchIplanGeometry even when mavatSearch has per-record errors (errors > 0)', async function() {
+		mavatSearchStub.resolves({ new: 0, changed: 0, unchanged: 0, errors: 3 });
+		await loadAndRunBin();
+		expect(fetchGeomStub.calledOnce).to.equal(true);
+	});
+
+	it('calls fetchIplanGeometry when the crawl found zero new/changed plans', async function() {
+		mavatSearchStub.resolves({ new: 0, changed: 0, unchanged: 5, errors: 0 });
+		await loadAndRunBin();
+		expect(fetchGeomStub.calledOnce).to.equal(true);
+	});
+
+	it('a fetchIplanGeometry failure does not crash the run and does not affect cadence gating', async function() {
+		mavatSearchStub.resolves({ new: 1, changed: 0, unchanged: 0, errors: 0 });
+		fetchGeomStub.rejects(new Error('backfill boom'));
+		const result = await loadAndRunBin();
+		expect(result).to.not.be.instanceOf(Error);
+		expect(setLastStub.calledOnce).to.equal(true);
+		expect(fetchGeomStub.calledOnce).to.equal(true);
 	});
 });

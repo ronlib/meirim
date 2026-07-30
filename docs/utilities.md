@@ -32,7 +32,7 @@ $ node bin/complete_mavat_data
 
 ## SV3 search crawl
 
-The [run_mavat_search](../server/bin/run_mavat_search) utility runs the Mavat SV3 search-based crawl. It automatically detects whether a backfill (fetch all plans) or incremental (fetch recently updated plans) run is needed based on database state and the last crawl date. The last crawl date is updated only when the full cycle finishes with zero errors (see [crawler cadence](./crawler.md#crawl-cadence)).
+The [run_mavat_search](../server/bin/run_mavat_search) utility runs the Mavat SV3 search-based crawl, followed by an automatic geometry-backfill phase (both orchestrated by [`crawlPipeline.js`](../server/api/lib/crawlPipeline.js)). It automatically detects whether a backfill (fetch all plans) or incremental (fetch recently updated plans) run is needed based on database state and the last crawl date. The last crawl date is updated only when the full cycle finishes with zero errors (see [crawler cadence](./crawler.md#crawl-cadence)). The geometry backfill runs unconditionally after the crawl so missing/placeholder geometry self-heals over time.
 
 ```bash
 $ node bin/run_mavat_search
@@ -40,7 +40,7 @@ $ node bin/run_mavat_search
 
 ## IPlan geometry fetch
 
-The [run_iplan_geometry](../server/bin/run_iplan_geometry) utility fetches geometry from the IPlan ArcGIS service for plans that are missing geometry or MP_ID. Unlike the legacy `npm run crawl` (which does a full dump of all plans), this only queries per-plan for those that need it.
+The [run_iplan_geometry](../server/bin/run_iplan_geometry) utility fetches geometry from the IPlan ArcGIS service for plans that are missing geometry or MP_ID. Unlike the legacy `npm run crawl` (which does a full dump of all plans), this only queries per-plan for those that need it. The recurring geometry backfill now ALSO runs automatically as the geometry-backfill phase of `bin/run_mavat_search` / `bin/iplan` (via [`crawlPipeline.js`](../server/api/lib/crawlPipeline.js)), so this bin is now a manual/ops escape hatch for on-demand geometry repair (e.g. after an iPlan outage or to run backfill on a separate cadence).
 
 ```bash
 $ node bin/run_iplan_geometry

@@ -22,13 +22,13 @@ Calls `controller.iplan()` — queries the IPlan ArcGIS service for all plan geo
 ```bash
 $ node bin/run_mavat_search
 ```
-Calls `controller.mavatSearch()` — uses the Mavat SV3 search API to discover plans via `paginateAllPlans()`. Lighter, supports both backfill (`dateLastStatusDate: null`) and incremental (`dateLastStatusDate = lastCrawl - bufferDays`) modes automatically.
+Calls `controller.mavatSearch()` — uses the Mavat SV3 search API to discover plans via `paginateAllPlans()`. Lighter, supports both backfill (`dateLastStatusDate: null`) and incremental (`dateLastStatusDate = lastCrawl - bufferDays`) modes automatically. The crawl is followed by an automatic geometry-backfill phase (orchestrated by [`crawlPipeline.js`](../server/api/lib/crawlPipeline.js)), which runs `controller.fetchIplanGeometry()` unconditionally after the crawl so missing/placeholder geometry self-heals over time.
 
 ### IPlan geometry fetch (lightweight)
 ```bash
 $ node bin/run_iplan_geometry
 ```
-Calls `controller.fetchIplanGeometry()` — queries the IPlan ArcGIS service only for plans missing geometry or MP_ID. Does NOT do a full-dump, only per-plan individual queries.
+Calls `controller.fetchIplanGeometry()` — queries the IPlan ArcGIS service only for plans missing geometry or MP_ID. Does NOT do a full-dump, only per-plan individual queries. Now also runs automatically as the geometry-backfill phase of the crawl (via [`crawlPipeline.js`](../server/api/lib/crawlPipeline.js)), so this bin is a manual/ops escape hatch for on-demand geometry repair (e.g. after an iPlan outage).
 
 ### Backfill missing Mavat data
 ```bash
@@ -116,7 +116,7 @@ The crawl logic is orchestrated by [`crawlCadence.js`](../server/api/lib/crawlCa
 - **Backfill mode**: Sets `dateLastStatusDate` to `null`, which triggers a full fetch of all plans. Designed to run once (the `backfillGuard` config flag can prevent accidental re-runs).
 - **Incremental mode**: Calculates `dateLastStatusDate` as `lastCrawlDate - bufferDays` (default 7 days). The 7-day buffer ensures that plans updated around the time of the last crawl are not missed.
 
-The last successful crawl date is stored in the `crawl_meta` table (`last_successful_mavat_crawl`). [`run_mavat_search`](../server/bin/run_mavat_search) updates it **only after a full cycle completes with zero per-record errors**. Catastrophic failures (thrown from `mavatSearch`) also skip the update. This prevents the incremental window from advancing past unprocessed or failed plans.
+The last successful crawl date is stored in the `crawl_meta` table (`last_successful_mavat_crawl`). [`run_mavat_search`](../server/bin/run_mavat_search) / [`iplan`](../server/bin/iplan) update it **only after a full cycle completes with zero per-record errors**. Catastrophic failures (thrown from `mavatSearch`) also skip the update. This prevents the incremental window from advancing past unprocessed or failed plans. The geometry-backfill phase that follows the crawl does NOT affect the cadence update — a backfill failure is logged and reported but never rolls back the cadence bookkeeping or fails the overall run.
 
 ### Schedule
 
