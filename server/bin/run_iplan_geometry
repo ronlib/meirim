@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+// Manual/ops escape hatch for on-demand geometry repair (e.g. after an iPlan outage
+// or to run backfill on a separate cadence). The recurring geometry backfill now
+// ALSO runs automatically as the geometry-backfill phase of bin/run_mavat_search /
+// bin/iplan (via server/api/lib/crawlPipeline.js), so production does not need this
+// bin to be scheduled. Keep this entry point for one-off repairs only.
+
 const controller = require('../api/controller/cron');
 const Log = require('../api/lib/log');
 const { runAndReport } = require('../metrics');

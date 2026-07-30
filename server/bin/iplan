@@ -1,35 +1,15 @@
 #!/usr/bin/env node
 
-// PATCH: this entry point used to run the old controller.iplan() blue-lines crawler.
-// It now runs the same logic as bin/run_mavat_search so that production's existing
-// cron line (`*/40 * * * * ... bin/iplan`, see README.md) picks up the new incremental
-// crawler without needing a devops change to the crontab. Once the crontab is updated
-// to call bin/run_mavat_search directly, this file can be deleted and bin/iplan removed
-// from README.md and package.json's `crawl` script.
+// bin/iplan is the production crontab entry point (`*/40 * * * * ... bin/iplan`, see
+// README.md). It runs the same mavatSearch crawl + geometry-backfill pipeline as
+// bin/run_mavat_search (the logic lives in api/lib/crawlPipeline.js), so production
+// gets the incremental crawler AND self-healing geometry backfill in the single
+// scheduled run. bin/run_mavat_search is the canonical entry point for new scheduling.
 
-const controller = require('../api/controller/cron');
-const crawlCadence = require('../api/lib/crawlCadence');
-const Log = require('../api/lib/log');
+const { runMavatSearchCrawl } = require('../api/lib/crawlPipeline');
 const { runAndReport } = require('../metrics');
 
 runAndReport({
-	func: async () => {
-		const STARTED_AT = Date.now();
-		Log.info('[run_mavat_search] Starting mavatSearch crawl');
-
-		const config = crawlCadence.getCrawlConfig();
-		Log.info(`[run_mavat_search] Crawl config: bufferDays=${config.bufferDays}, backfillSchedule=${config.backfillSchedule}, incrementalSchedule=${config.incrementalSchedule}`);
-
-		const dateLastStatusDate = await crawlCadence.calculateDateLastStatusDate(config.bufferDays);
-		Log.info(`[run_mavat_search] Mode: ${dateLastStatusDate === null ? 'BACKFILL (all plans)' : 'INCREMENTAL (since ' + dateLastStatusDate + ')'}`);
-
-		const result = await controller.mavatSearch(dateLastStatusDate);
-		if (result && result.errors === 0) {
-			await crawlCadence.setLastSuccessfulCrawlDate();
-		} else {
-			Log.warn(`[run_mavat_search] last crawl date was NOT updated due to errors: ${result && result.errors}`);
-		}
-		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
-		Log.info(`[run_mavat_search] mavatSearch completed in ${elapsed}s: ${JSON.stringify(result)}`);
-	}, name: 'iplan'
+	func: runMavatSearchCrawl,
+	name: 'iplan'
 });

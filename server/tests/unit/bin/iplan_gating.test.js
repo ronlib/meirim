@@ -13,6 +13,7 @@ describe('iplan gating', function() {
 	let setLastStub;
 	let mavatSearchStub;
 	let iplanStub;
+	let fetchGeomStub;
 	let logWarnStub;
 	let lastRunPromise;
 
@@ -33,9 +34,11 @@ describe('iplan gating', function() {
 		setLastStub = sinon.stub(crawlCadence, 'setLastSuccessfulCrawlDate').resolves();
 		mavatSearchStub = sinon.stub(controller, 'mavatSearch');
 		iplanStub = sinon.stub(controller, 'iplan').resolves();
+		fetchGeomStub = sinon.stub(controller, 'fetchIplanGeometry').resolves(0);
 		logWarnStub = sinon.stub(Log, 'warn');
 		sinon.stub(Log, 'info');
 		sinon.stub(Log, 'error');
+		sinon.stub(metrics, 'report');
 		sinon.stub(metrics, 'runAndReport').callsFake(({ func }) => {
 			lastRunPromise = (async () => {
 				try {
@@ -92,5 +95,11 @@ describe('iplan gating', function() {
 		mavatSearchStub.resolves({ new: 1, changed: 0, unchanged: 0, errors: 0 });
 		await loadAndRunBin();
 		expect(iplanStub.called).to.equal(false);
+	});
+
+	it('calls fetchIplanGeometry as the geometry-backfill phase after the crawl', async function() {
+		mavatSearchStub.resolves({ new: 1, changed: 0, unchanged: 0, errors: 0 });
+		await loadAndRunBin();
+		expect(fetchGeomStub.calledOnce).to.equal(true);
 	});
 });
