@@ -70,7 +70,7 @@ const calculateDateLastStatusDate = async (bufferDays) => {
 		return null;
 	}
 
-	const bufferDate = moment(lastDate, 'DD/MM/YYYY').subtract(buf, 'days').format('YYYY-MM-DD');
+	const bufferDate = moment(lastDate, 'DD/MM/YYYY').subtract(buf, 'days').format('DD/MM/YYYY');
 	Log.info(`[crawlCadence] Mode: INCREMENTAL — dateLastStatusDate=${bufferDate} (max in DB: ${lastDate}, buffer: ${buf}d)`);
 	return bufferDate;
 };
