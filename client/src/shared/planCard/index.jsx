@@ -123,11 +123,12 @@ const PlanCard = ({ plan }) => {
                                     {`${areaInDunam} דונם`}
                                 </ChipText>
                             </FooterChip> : <div />}
-						</MapFooter>
+</MapFooter>
 						<Mapa
 							geom={plan.geom}
 							hideZoom={true}
 							disableInteractions={true}
+							showPlaceholder={true}
 						/>
 					</SC.CardMedia>
 					<SC.CardContent>

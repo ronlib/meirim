@@ -1,13 +1,14 @@
 import React from 'react';
 import leaflet from 'leaflet';
 import { Map, TileLayer, GeoJSON, ZoomControl } from 'react-leaflet';
+import { isPlanGeomValid } from './mapaGeom';
 import './Mapa.css';
 
 
 const Mapa = (props) =>  {
 	const { hideZoom, disableInteractions, title2, geom, countyName, maxZoom=17, showPlaceholder=false } = props;
 
-	if (!geom || geom.length === 0) {
+	if (!isPlanGeomValid(geom)) {
 		if (showPlaceholder) {
 			return (
 				<div className="map-title-placeholder" style={{ height: '100%', width: '100%' }}>
@@ -20,7 +21,24 @@ const Mapa = (props) =>  {
 		}
 	}
 
-	const bounds = leaflet.geoJSON(geom).getBounds();
+	let bounds;
+	try {
+		bounds = leaflet.geoJSON(geom).getBounds();
+	} catch (e) {
+		bounds = null;
+	}
+	if (!bounds || !bounds.isValid()) {
+		if (showPlaceholder) {
+			return (
+				<div className="map-title-placeholder" style={{ height: '100%', width: '100%' }}>
+					{countyName && <span className="btn btn-light disabled">{countyName}</span>}
+					{title2 && <span className="btn btn-light map-title-left">{title2}</span>}
+				</div>
+			);
+		} else {
+			return null;
+		}
+	}
 
 	// hash the geom to create a key for the layer so react replaces the component properly
 	// since updated GeoJson layers are not updated after mount according to docs
