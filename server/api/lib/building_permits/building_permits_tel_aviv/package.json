@@ -1,0 +1,31 @@
+{
+  "name": "building-permits",
+  "version": "0.1.0",
+  "description": "Standalone scraper for Israeli municipal building-permit and construction-site GIS layers (currently Tel Aviv-Yafo)",
+  "main": "index.js",
+  "bin": {
+    "building-permits": "bin/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "crawl": "node bin/cli.js crawl",
+    "validate": "node bin/cli.js validate",
+    "stats": "node bin/cli.js stats"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "gis",
+    "arcgis",
+    "building-permits",
+    "israel",
+    "tel-aviv",
+    "scraper",
+    "civic-tech"
+  ],
+  "license": "MIT",
+  "private": true
+}
