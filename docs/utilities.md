@@ -32,7 +32,7 @@ $ node bin/complete_mavat_data
 
 ## SV3 search crawl
 
-The [run_mavat_search](../server/bin/run_mavat_search) utility runs the Mavat SV3 search-based crawl. It automatically detects whether a backfill (fetch all plans) or incremental (fetch recently updated plans) run is needed based on database state and the last crawl date.
+The [run_mavat_search](../server/bin/run_mavat_search) utility runs the Mavat SV3 search-based crawl. It automatically detects whether a backfill (fetch all plans) or incremental (fetch recently updated plans) run is needed based on database state and the last crawl date. The last crawl date is updated only when the full cycle finishes with zero errors (see [crawler cadence](./crawler.md#crawl-cadence)).
 
 ```bash
 $ node bin/run_mavat_search

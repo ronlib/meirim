@@ -19,4 +19,5 @@ exports.status = require('./status_struct');
 exports.status_mapping = require('./status_mapping_struct');
 exports.plan_status_change = require('./plan_status_change_struct');
 exports.plan_links = require('./plan_link_struct');
+exports.crawl_meta = require('./crawl_meta_struct');
 

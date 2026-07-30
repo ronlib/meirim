@@ -116,6 +116,8 @@ The crawl logic is orchestrated by [`crawlCadence.js`](../server/api/lib/crawlCa
 - **Backfill mode**: Sets `dateLastStatusDate` to `null`, which triggers a full fetch of all plans. Designed to run once (the `backfillGuard` config flag can prevent accidental re-runs).
 - **Incremental mode**: Calculates `dateLastStatusDate` as `lastCrawlDate - bufferDays` (default 7 days). The 7-day buffer ensures that plans updated around the time of the last crawl are not missed.
 
+The last successful crawl date is stored in the `crawl_meta` table (`last_successful_mavat_crawl`). [`run_mavat_search`](../server/bin/run_mavat_search) updates it **only after a full cycle completes with zero per-record errors**. Catastrophic failures (thrown from `mavatSearch`) also skip the update. This prevents the incremental window from advancing past unprocessed or failed plans.
+
 ### Schedule
 
 | Mode | Cron | Frequency |
