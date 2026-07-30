@@ -2,6 +2,7 @@ import React from 'react';
 import leaflet from 'leaflet';
 import { Map, TileLayer, GeoJSON, ZoomControl } from 'react-leaflet';
 import { isPlanGeomValid } from './mapaGeom';
+import './leafletSetup';
 import './Mapa.css';
 
 

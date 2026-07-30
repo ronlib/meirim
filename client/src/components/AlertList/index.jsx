@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Circle, Map, TileLayer } from 'react-leaflet';
 import api from 'services/api';
 import '../../../node_modules/leaflet/dist/leaflet.css';
+import '../leafletSetup';
 import AlertTable from '../AlertTable';
 import { Message } from './style';
 
