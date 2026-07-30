@@ -88,7 +88,7 @@ class Plan extends Model {
 	}
 
 	get geometry () {
-		return ['geom'];
+		return ['geom', 'geom_centroid'];
 	}
 
 	get tableName () {

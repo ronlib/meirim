@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "meirim_test"
     ports:
-      - 33060:3306
+      - 3306:3306
 
   migrator:
     image: node:14-slim

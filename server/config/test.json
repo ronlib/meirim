@@ -19,18 +19,8 @@
 		"lastVisitedDifference": -1
 	},
 	"database": {
-		"client": "mysql",
 		"connection": {
-			"host": "localhost",
-			"port": 33060,
-			"user": "root",
-			"password": "password",
-			"database": "test_meirim",
-			"charset": "utf8"
-		},
-		"pool": {
-			"min": 2,
-			"max": 10
+			"database": "test_meirim"
 		}
 	}
 }
