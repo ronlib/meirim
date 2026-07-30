@@ -1,3 +1,4 @@
+const moment = require('moment');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const Bluebird = require('bluebird');
@@ -243,6 +244,9 @@ const searchPlans = async (params) => {
 	const latestUpdate = records.length > 0
 		? records.reduce((latest, r) => !latest || r.UPDATE_DATE > latest ? r.UPDATE_DATE : latest, null)
 		: null;
+	const oldestUpdate = records.length > 0
+		? records.reduce((oldest, r) => !oldest || r.UPDATE_DATE < oldest ? r.UPDATE_DATE : oldest, null)
+		: null;
 
 	Log.info(`[searchApi] searchPlans result: ${records.length} records returned, total: ${totalRecords}, pages: ${totalPages}, strategy: ${currentStrategy}, latest UPDATE_DATE: ${latestUpdate}`);
 
@@ -252,6 +256,7 @@ const searchPlans = async (params) => {
 		totalPages,
 		strategy: currentStrategy,
 		latestUpdateDate: latestUpdate,
+		oldestUpdateDate: oldestUpdate,
 	};
 };
 
@@ -262,6 +267,8 @@ async function* paginateAllPlans(dateLastStatusDate) {
 	let totalRecords = Infinity;
 	let tokenRefreshCounter = 0;
 	let latestUpdateDate = null;
+	let consecutiveStalePages = 0;
+	const STALE_PAGE_THRESHOLD = 3;
 
 	Log.info(`[searchApi] paginateAllPlans starting — dateLastStatusDate=${dateLastStatusDate}, pageSize=${PAGE_SIZE}`);
 
@@ -311,6 +318,22 @@ async function* paginateAllPlans(dateLastStatusDate) {
 		if (result.records.length === 0) {
 			Log.info(`[searchApi] Page ${pageNum - 1} returned 0 records — stopping early (fetched ${totalFetched}/${totalRecords})`);
 			break;
+		}
+
+		if (dateLastStatusDate && result.oldestUpdateDate) {
+			const cutoff = moment(dateLastStatusDate, 'DD/MM/YYYY');
+			const pageOldest = moment(result.oldestUpdateDate, 'DD/MM/YYYY');
+			if (pageOldest.isBefore(cutoff)) {
+				consecutiveStalePages++;
+				Log.info(`[searchApi] Stale page ${pageNum - 1}: oldest record (${result.oldestUpdateDate}) < cutoff (${dateLastStatusDate}) — ${consecutiveStalePages}/${STALE_PAGE_THRESHOLD} consecutive`);
+				if (consecutiveStalePages >= STALE_PAGE_THRESHOLD) {
+					const stalePagesSkipped = Math.ceil(totalRecords / PAGE_SIZE) - pageNum + 1;
+					Log.info(`[searchApi] Stopping early after ${consecutiveStalePages} consecutive stale pages — skipping ~${stalePagesSkipped} remaining pages`);
+					break;
+				}
+			} else {
+				consecutiveStalePages = 0;
+			}
 		}
 	}
 
