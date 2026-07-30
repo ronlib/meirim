@@ -78,6 +78,10 @@ class PlanController extends Controller {
 
 			// filter out plans that should not be returned in geo search
 			q.where.geo_search_filter = [false];
+
+			q.whereRaw.push(Knex.raw('ST_AsText(geom) != \'POINT(0 0)\''));
+		} else {
+			q.whereRaw = [Knex.raw('ST_AsText(geom) != \'POINT(0 0)\'')];
 		}
 
 		return super.browse(req, q).then(col => {

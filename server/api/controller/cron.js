@@ -23,6 +23,8 @@ const PlanStatusChange = require('../model/plan_status_change');
 const {	meirimStatuses } = require('../constants');
 const { report } = require('../../metrics');
 
+const PLACEHOLDER_GEOM = { type: 'Point', coordinates: [0, 0] };
+
 const iplan = (limit = -1) =>
 	iplanApi
 		.getBlueLines()
@@ -112,7 +114,7 @@ const createPlanFromSearchResult = async (record) => {
 		data: { SV3_UPDATE_DATE: record.UPDATE_DATE, SV3_STATUS: record.INTERNET_SHORT_STATUS, SV3_UNIFIED_STATUS: record.UNIFIED_STATUS_DESC },
 		PLAN_COUNTY_NAME: '',
 		PLAN_CHARACTOR_NAME: '',
-		geom: { type: 'Point', coordinates: [0, 0] },
+		geom: PLACEHOLDER_GEOM,
 		sent: 0,
 		geo_search_filter: false,
 		rating: 0,
@@ -182,7 +184,7 @@ const fetchIplanGeometry = async () => {
 
 	try {
 		const { models: plansNeedingGeometry } = await Plan.query(qb => {
-			qb.whereRaw('(geom IS NULL OR MP_ID IS NULL OR MP_ID = \'\')');
+			qb.whereRaw('(geom IS NULL OR ST_AsText(geom) = \'POINT(0 0)\' OR MP_ID IS NULL OR MP_ID = \'\')');
 		}).fetchAll();
 
 		Log.info(`[cron] Found ${plansNeedingGeometry.length} plans needing geometry`);
@@ -770,6 +772,7 @@ module.exports = {
 	iplan,
 	mavatSearch,
 	fetchIplanGeometry,
+	PLACEHOLDER_GEOM,
 	complete_mavat_data,
 	sendPlanningAlerts,
 	complete_jurisdiction_from_mavat,
