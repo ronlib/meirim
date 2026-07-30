@@ -7,16 +7,28 @@ const LAST_CRAWL_KEY = 'crawl:last_crawl_date';
 const DEFAULT_BUFFER_DAYS = 7;
 
 const getLastCrawlDate = async () => {
-	Log.info('[crawlCadence] Querying max UPDATE_DATE from plan table');
+	Log.info('[crawlCadence] Querying last successful crawl date from crawl_meta');
 	const { Knex } = require('../service/database');
 	try {
-		const row = await Knex('plan').max('UPDATE_DATE as max_update').first();
-		const maxUpdate = row?.max_update || null;
-		Log.info(`[crawlCadence] Last crawl date from DB: ${maxUpdate || 'none'}`);
-		return maxUpdate;
+		const row = await Knex('crawl_meta').where({ key: 'last_successful_mavat_crawl' }).first();
+		return row?.value || null;
 	} catch (e) {
 		Log.warn(`[crawlCadence] Could not determine last crawl date: ${e.message}`, { stack: e.stack });
 		return null;
+	}
+};
+
+const setLastSuccessfulCrawlDate = async () => {
+	const now = new Date();
+	const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+	Log.info(`[crawlCadence] Setting last successful mavat crawl date to ${dateStr}`);
+	const { Knex } = require('../service/database');
+	try {
+		await Knex('crawl_meta')
+			.where({ key: 'last_successful_mavat_crawl' })
+			.update({ value: dateStr, updated_at: Knex.fn.now() });
+	} catch (e) {
+		Log.warn(`[crawlCadence] Could not set last crawl date: ${e.message}`, { stack: e.stack });
 	}
 };
 
@@ -71,6 +83,7 @@ module.exports = {
 	calculateDateLastStatusDate,
 	isBackfillComplete,
 	getLastCrawlDate,
+	setLastSuccessfulCrawlDate,
 	getCrawlConfig,
 	DEFAULT_BUFFER_DAYS,
 };

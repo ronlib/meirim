@@ -17,6 +17,7 @@ runAndReport({
 		Log.info(`[run_mavat_search] Mode: ${dateLastStatusDate === null ? 'BACKFILL (all plans)' : 'INCREMENTAL (since ' + dateLastStatusDate + ')'}`);
 
 		const result = await controller.mavatSearch(dateLastStatusDate);
+		await crawlCadence.setLastSuccessfulCrawlDate();
 		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
 		Log.info(`[run_mavat_search] mavatSearch completed in ${elapsed}s: ${JSON.stringify(result)}`);
 	}, name: 'mavatSearch'
