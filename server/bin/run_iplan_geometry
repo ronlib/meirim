@@ -6,8 +6,11 @@ const { runAndReport } = require('../metrics');
 
 runAndReport({
 	func: async () => {
-		Log.info('Running fetchIplanGeometry');
+		const STARTED_AT = Date.now();
+		Log.info('[run_iplan_geometry] Starting geometry fetch for plans missing geometry');
+
 		const count = await controller.fetchIplanGeometry();
-		Log.info(`fetchIplanGeometry completed: ${count} plans updated`);
+		const elapsed = ((Date.now() - STARTED_AT) / 1000).toFixed(1);
+		Log.info(`[run_iplan_geometry] fetchIplanGeometry completed: ${count} plans updated in ${elapsed}s`);
 	}, name: 'fetchIplanGeometry'
 });
