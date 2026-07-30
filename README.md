@@ -162,6 +162,9 @@ Set up cron to schedule three jobs - crawling for new data, emailing alerts to u
 
 ```bash
 $ crontab -e
+# NOTE: bin/iplan is currently a patched alias for the mavat-search crawler (see server/bin/iplan).
+# It runs the same flow as bin/run_mavat_search. Once the crontab is updated to call
+# bin/run_mavat_search directly, bin/iplan can be removed.
 */40 * * * *  cd /path_to_code/meirim/server && NODE_ENV='production' /usr/bin/node /path_to_code/meirim/bin/iplan >> /path_to_code/meirim/server/logs/combined.log
 */20 * * * * cd /path_to_code/meirim/server && NODE_ENV='production' /usr/bin/node /path_to_code/meirim/bin/plan_status_change >> /path_to_code/meirim/server/logs/combined.log 2>&1
 0 10,21 * * SUN-THU cd /path_to_code/meirim/server && NODE_ENV='production' /usr/bin/node /path_to_code/meirim/bin/fetch_tree_permit >> /path_to_code/meirim/server/logs/combined.log 2>&1
