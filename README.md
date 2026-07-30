@@ -110,12 +110,12 @@ $ npm run crawl
 
 ## Testing
 
-Tests require all prerequisites to be fulfilled and a database instance to be available at port 3306 on localhost. The odd port is for preventing people from running the tests on development databases accidentally (and can be changed by overriding the test section at [server/config/default.json](server/config/default.json)).
+Tests require all prerequisites to be fulfilled and a database instance to be available at port 33060 on localhost. The odd port is for preventing people from running the tests on development databases accidentally (and can be changed by overriding the test section at [server/config/default.json](server/config/default.json)).
 
 If you use docker to run the MYSQL, you may use this command to lift a docker for testing
 
 ```bash
-docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:5.7
+docker run -p 33060:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:5.7
 ```
 
 ### Backend tests
